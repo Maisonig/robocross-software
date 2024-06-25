@@ -15,39 +15,10 @@ front_cloud_to_scan:
     angle_min: -0.785
     rays_number: 120
 
-local_mapping:
-  ros__parameters:
-    frequency: 30
-    front_detection_topic: /front_camera/detection
-    back_detection_topic: /back_camera/detection
-    front_depth_topic: /front_camera/depth
-    back_depth_topic: /back_camera/depth
-    front_scan_topic: /front_camera/scan
-    back_scan_topic: /back_camera/scan
-    odom_topic: /odom
-    grid_topic: /local_map
-    robot_frame: base_footprint
-    robot_radius: 2.0
-    front_camera_frame: front_camera_link
-    back_camera_frame: back_camera_link
-    grid_size: 30
-    grid_resolution: 0.1
-
-global_mapping:
-  ros__parameters:
-    frequency: 30
-    odom_topic: /odom
-    local_grid_topic: /local_map
-    global_grid_topic: /global_map
-    global_grid_frame: map
-    robot_frame: chassis
-    grid_size: 120
-    grid_resolution: 0.1
-
 path_planning:
   ros__parameters:
     frequency: 30
-    global_grid_topic: /global_map
+    global_grid_topic: /map
     odom_topic: /odom
     goal_topic: /goal_pose
     path_topic: /path

@@ -1,0 +1,3635 @@
+<?xml version="1.0"?>
+<!--
+  Gazebo Ackermann steering plugin demo
+
+  Try sending commands:
+
+    gz topic -t "/model/vehicle_blue/cmd_vel" -m gz.msgs.Twist -p "linear: {x: 0.5}, angular: {z: 0.1}"
+
+  Listen to odometry:
+
+    gz topic -e -t /model/vehicle_blue/odometry
+
+-->
+<sdf version="1.9">
+    <world name="edu_world">
+
+        <spherical_coordinates>
+            <surface_model>EARTH_WGS84</surface_model>
+            <world_frame_orientation>ENU</world_frame_orientation>
+            <latitude_deg>-22.986687</latitude_deg>
+            <longitude_deg>-43.202501</longitude_deg>
+            <elevation>0</elevation>
+            <heading_deg>0</heading_deg>
+        </spherical_coordinates>
+
+        <physics name="1ms" type="ignored">
+            <max_step_size>0.05</max_step_size>
+            <real_time_factor>0.2</real_time_factor>
+        </physics>
+        <plugin
+            filename="gz-sim-imu-system"
+            name="gz::sim::systems::Imu">
+        </plugin>
+        <plugin
+            filename="ignition-gazebo-navsat-system"
+            name="ignition::gazebo::systems::NavSat">
+        </plugin>
+        <plugin
+            filename="gz-sim-physics-system"
+            name="gz::sim::systems::Physics">
+        </plugin>
+        <plugin
+            filename="gz-sim-user-commands-system"
+            name="gz::sim::systems::UserCommands">
+        </plugin>
+        <plugin
+            filename="gz-sim-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster">
+        </plugin>
+        <plugin
+            filename="gz-sim-sensors-system"
+            name="gz::sim::systems::Sensors">
+            <render_engine>ogre2</render_engine>
+        </plugin>
+
+        <light type="directional"
+            name="sun">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.5 0.5 0.5 1</specular>
+            <attenuation>
+                <range>1000</range>
+                <constant>0.9</constant>
+                <linear>0.01</linear>
+                <quadratic>0.001</quadratic>
+            </attenuation>
+            <direction>-0.5 0.1 -0.9</direction>
+        </light>
+
+        <model name="ground_plane">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <plane>
+                            <normal>0 0 1</normal>
+                            <size>100 100</size>
+                        </plane>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>50</mu>
+                            </ode>
+                            <bullet>
+                                <friction>1</friction>
+                                <rolling_friction>0.1</rolling_friction>
+                            </bullet>
+                        </friction>
+                    </surface>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <plane>
+                            <normal>0 0 1</normal>
+                            <size>100 100</size>
+                        </plane>
+                    </geometry>
+                    <material>
+                        <ambient>0.6 0.6 0.6 1</ambient>
+                        <diffuse>0.6 0.6 0.6 1</diffuse>
+                        <specular>0.8 0.8 0.8 1</specular>
+                    </material>
+                </visual>
+            </link>
+        </model>
+
+
+        <model name='barier_0_0'>
+            <pose> 5.8799845701 -56.4551391899 0.4000000000
+                0.0000000000 0.0000000000 0.1847995679 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_1'>
+            <pose> 9.7008855716 -55.4941440137 0.4000000000
+                0.0000000000 0.0000000000 0.3079992798 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_2'>
+            <pose> 13.3747310364 -54.0708886982 0.4000000000
+                0.0000000000 0.0000000000 0.4311989917 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_3'>
+            <pose> 16.8458292121 -52.2069483433 0.4000000000
+                0.0000000000 0.0000000000 0.5543987036 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_4'>
+            <pose> 20.0615617886 -49.9305783848 0.4000000000
+                0.0000000000 0.0000000000 0.6775984155 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_5'>
+            <pose> 22.9731815381 -47.2762862708 0.4000000000
+                0.0000000000 0.0000000000 0.8007981274 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_6'>
+            <pose> 25.5365512730 -44.2843083641 0.4000000000
+                0.0000000000 0.0000000000 0.9239978393 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_7'>
+            <pose> 27.7128129211 -41.0000000000 0.4000000000
+                0.0000000000 0.0000000000 1.0471975512 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_8'>
+            <pose> 29.4689765742 -37.4731479454 0.4000000000
+                0.0000000000 0.0000000000 1.1703972631 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_9'>
+            <pose> 30.7784205815 -33.7572156823 0.4000000000
+                0.0000000000 0.0000000000 1.2935969750 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_10'>
+            <pose> 31.6212951066 -29.9085329561 0.4000000000
+                0.0000000000 0.0000000000 1.4167966869 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_11'>
+            <pose> 31.9848230308 -25.9854418738 0.4000000000
+                0.0000000000 0.0000000000 1.5399963988 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_12'>
+            <pose> 31.8634936414 -22.0474124972 0.4000000000
+                0.0000000000 0.0000000000 -1.4783965429 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_13'>
+            <pose> 31.2591461683 -18.1541413374 0.4000000000
+                0.0000000000 0.0000000000 -1.3551968310 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_14'>
+            <pose> 30.1809419031 -14.3646464167 0.4000000000
+                0.0000000000 0.0000000000 -1.2319971191 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_15'>
+            <pose> 28.6452253234 -10.7363726152 0.4000000000
+                0.0000000000 0.0000000000 -1.1087974071 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_16'>
+            <pose> 26.6752763271 -7.3243208653 0.4000000000
+                0.0000000000 0.0000000000 -0.9855976952 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_17'>
+            <pose> 24.3009573330 -4.1802143935 0.4000000000
+                0.0000000000 0.0000000000 -0.8623979833 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_18'>
+            <pose> 21.5582605967 -1.3517146489 0.4000000000
+                0.0000000000 0.0000000000 -0.7391982714 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_19'>
+            <pose> 18.4887626051 1.1183011954 0.4000000000
+                0.0000000000 0.0000000000 -0.6159985595 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_20'>
+            <pose> 15.1389938188 3.1923902171 0.4000000000
+                0.0000000000 0.0000000000 -0.4927988476 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_21'>
+            <pose> 11.5597333180 4.8391113409 0.4000000000
+                0.0000000000 0.0000000000 -0.3695991357 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_22'>
+            <pose> 7.8052390435 6.0335019531 0.4000000000
+                0.0000000000 0.0000000000 -0.2463994238 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_0_23'>
+            <pose> 3.9324253013 6.7574563095 0.4000000000
+                0.0000000000 0.0000000000 -0.1231997119 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_0'>
+            <pose> 5.8056935451 -44.1388067146 0.4000000000
+                0.0000000000 0.0000000000 0.2945243113 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_1'>
+            <pose> 9.4279347365 -42.6384252870 0.4000000000
+                0.0000000000 0.0000000000 0.4908738521 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_2'>
+            <pose> 12.6878656833 -40.4602090673 0.4000000000
+                0.0000000000 0.0000000000 0.6872233930 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_3'>
+            <pose> 15.4602090673 -37.6878656833 0.4000000000
+                0.0000000000 0.0000000000 0.8835729338 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_4'>
+            <pose> 17.6384252870 -34.4279347365 0.4000000000
+                0.0000000000 0.0000000000 1.0799224747 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_5'>
+            <pose> 19.1388067146 -30.8056935451 0.4000000000
+                0.0000000000 0.0000000000 1.2762720155 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_6'>
+            <pose> 19.9036945334 -26.9603428066 0.4000000000
+                0.0000000000 0.0000000000 1.4726215564 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_7'>
+            <pose> 19.9036945334 -23.0396571934 0.4000000000
+                0.0000000000 0.0000000000 -1.4726215564 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_8'>
+            <pose> 19.1388067146 -19.1943064549 0.4000000000
+                0.0000000000 0.0000000000 -1.2762720155 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_9'>
+            <pose> 17.6384252870 -15.5720652635 0.4000000000
+                0.0000000000 0.0000000000 -1.0799224747 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_10'>
+            <pose> 15.4602090673 -12.3121343167 0.4000000000
+                0.0000000000 0.0000000000 -0.8835729338 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_11'>
+            <pose> 12.6878656833 -9.5397909327 0.4000000000
+                0.0000000000 0.0000000000 -0.6872233930 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_12'>
+            <pose> 9.4279347365 -7.3615747130 0.4000000000
+                0.0000000000 0.0000000000 -0.4908738521 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_13'>
+            <pose> 5.8056935451 -5.8611932854 0.4000000000
+                0.0000000000 0.0000000000 -0.2945243113 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barier_1_14'>
+            <pose> 1.9603428066 -5.0963054666 0.4000000000
+                0.0000000000 0.0000000000 -0.0981747704 </pose>
+            <link name='barier_link'>
+                <collision name='barier_collision'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>4 0.1 0.3</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 0 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+            <link name='barier_link1'>
+                <collision name='barier_collision1'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='box_visual'>
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.300000012 0.300000012 0.300000012 1</ambient>
+                        <diffuse>0.699999988 0.699999988 0.699999988 1</diffuse>
+                        <specular>1 1 1 1</specular>
+                    </material>
+                </visual>
+                <pose>0 0 -0.38 0 0 0</pose>
+                <enable_wind>false</enable_wind>
+            </link>
+
+            <static>true</static>
+            <self_collide>true</self_collide>
+        </model>
+
+
+        <model name='barrel_1'>
+            <pose>0 -2 0
+                0 0 0</pose>
+            <link name="barrel1">
+                <pose>0 0 0.47
+                    0 0 0</pose>
+
+                <collision name='barrel_collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name="barrel1v">
+                    <pose>0 0 0
+                        0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0 0.33 1.0 1</ambient>
+                        <diffuse>0 0.33 1.0 1</diffuse>
+                        <specular>0.0 0.0 1.0 1</specular>
+                    </material>
+                </visual>
+            </link>
+
+        </model>
+
+        <model name='barrel_2'>
+            <pose>5 2 0
+                0 0 0</pose>
+            <link name="barrel1">
+                <pose>0 0 0.47
+                    0 0 0</pose>
+                <collision name='barrel_collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name="barrel1v">
+                    <pose>0 0 0
+                        0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0 0.33 1.0 1</ambient>
+                        <diffuse>0 0.33 1.0 1</diffuse>
+                        <specular>0.0 0.0 1.0 1</specular>
+                    </material>
+                </visual>
+            </link>
+
+        </model>
+
+        <model name='barrel_3'>
+            <pose>10 1 0
+                0 0 0</pose>
+            <link name="barrel1">
+                <pose>0 0 0.47
+                    0 0 0</pose>
+                <collision name='barrel_collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name="barrel1v">
+                    <pose>0 0 0
+                        0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0 0.33 1.0 1</ambient>
+                        <diffuse>0 0.33 1.0 1</diffuse>
+                        <specular>0.0 0.0 1.0 1</specular>
+                    </material>
+                </visual>
+            </link>
+
+        </model>
+
+        <model name='barrel_4'>
+            <pose>15 -7 0
+                0 0 0</pose>
+            <link name="barrel1">
+                <pose>0 0 0.47
+                    0 0 0</pose>
+                <collision name='barrel_collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name="barrel1v">
+                    <pose>0 0 0
+                        0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0 0.33 1.0 1</ambient>
+                        <diffuse>0 0.33 1.0 1</diffuse>
+                        <specular>0.0 0.0 1.0 1</specular>
+                    </material>
+                </visual>
+            </link>
+
+        </model>
+
+        <model name='barrel_5'>
+            <pose>20 -2 0
+                0 0 0</pose>
+            <link name="barrel1">
+                <pose>0 0 0.47
+                    0 0 0</pose>
+                <collision name='barrel_collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name="barrel1v">
+                    <pose>0 0 0
+                        0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0 0.33 1.0 1</ambient>
+                        <diffuse>0 0.33 1.0 1</diffuse>
+                        <specular>0.0 0.0 1.0 1</specular>
+                    </material>
+                </visual>
+            </link>
+
+        </model>
+
+        <model name='barrel_6'>
+            <pose>25 -15 0
+                0 0 0</pose>
+            <link name="barrel1">
+                <pose>0 0 0.47
+                    0 0 0</pose>
+                <collision name='barrel_collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name="barrel1v">
+                    <pose>0 0 0
+                        0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.9</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0 0.33 1.0 1</ambient>
+                        <diffuse>0 0.33 1.0 1</diffuse>
+                        <specular>0.0 0.0 1.0 1</specular>
+                    </material>
+                </visual>
+            </link>
+
+        </model>
+
+
+        <model name='edu_bot'>
+            <pose>0 0 1.1 0 -0 0</pose>
+
+            <link name='chassis'>
+                <pose>0 0 0 0 0 0</pose>
+                <inertial>
+                    <mass>1.14395</mass>
+                    <inertia>
+                        <ixx>0.126164</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>0.416519</iyy>
+                        <iyz>0</iyz>
+                        <izz>0.481014</izz>
+                    </inertia>
+                </inertial>
+                <visual name='visual'>
+                    <geometry>
+                        <box>
+                            <size> 4.26 1.7 0.93</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.5 0.5 1.0 1</ambient>
+                        <diffuse>0.5 0.5 1.0 1</diffuse>
+                        <specular>0.0 0.0 1.0 1</specular>
+                    </material>
+                </visual>
+                <collision name='collision'>
+                    <geometry>
+                        <box>
+                            <size>4.26 1.7 0.93</size>
+                        </box>
+                    </geometry>
+                </collision>
+            </link>
+
+            <link name="front_camera_link">
+                <pose>2.16 0 -0.47 0 0 0</pose>
+                <inertial>
+                    <mass>0.1</mass>
+                    <inertia>
+                        <ixx>0.000166667</ixx>
+                        <iyy>0.000166667</iyy>
+                        <izz>0.000166667</izz>
+                    </inertia>
+                </inertial>
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.1</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.1</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <sensor name="camera" type="camera">
+                    <topic>/front_camera/image</topic>
+                    <camera>
+                        <horizontal_fov>1.047</horizontal_fov>
+                        <image>
+                            <width>640</width>
+                            <height>480</height>
+                        </image>
+                        <clip>
+                            <near>0.1</near>
+                            <far>100</far>
+                        </clip>
+                    </camera>
+                    <always_on>1</always_on>
+                    <update_rate>30</update_rate>
+                    <visualize>true</visualize>
+                </sensor>
+
+                <sensor name='gpu_lidar' type='gpu_lidar'>"<!-- <pose relative_to='chassis'>0 0 0
+                        0 0 0</pose> -->
+                    <gz_frame_id>front_camera_link</gz_frame_id>
+                    <topic>/front_camera</topic>
+                    <update_rate>10</update_rate>
+                    <ray>
+                        <scan>
+                            <horizontal>
+                                <samples>90</samples>
+                                <resolution>1</resolution>
+                                <min_angle>-0.785</min_angle>
+                                <max_angle>0.785</max_angle>
+                            </horizontal>
+                            <vertical>
+                                <samples>60</samples>
+                                <resolution>1</resolution>
+                                <min_angle>-0.52</min_angle>
+                                <max_angle>0.52</max_angle>
+                            </vertical>
+                        </scan>
+                        <range>
+                            <min>0.08</min>
+                            <max>10.0</max>
+                            <resolution>0.01</resolution>
+                        </range>
+                    </ray>
+                    <alwaysOn>
+                    1</alwaysOn>
+                    <visualize>true</visualize>
+                </sensor>
+            </link>
+
+
+            <link name="navsat">
+                <pose>0 0 0.75 0 0 0</pose>
+                <inertial>
+                    <mass>0.1</mass>
+                    <inertia>
+                        <ixx>0.000166667</ixx>
+                        <iyy>0.000166667</iyy>
+                        <izz>0.000166667</izz>
+                    </inertia>
+                </inertial>
+                <collision name="collision">
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.1</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.1 0.1 0.1</size>
+                        </box>
+                    </geometry>
+                </visual>
+
+                <sensor name="navsat" type="navsat">
+                    <always_on>1</always_on>
+                    <update_rate>1</update_rate>
+                    <topic>navsat</topic>
+                </sensor>
+                <sensor name="imu_sensor" type="imu">
+                    <always_on>1</always_on>
+                    <update_rate>1</update_rate>
+                    <visualize>true</visualize>
+                    <topic>imu</topic>
+                </sensor>
+                <!-- <sensor name='gpu_lidar' type='gpu_lidar'>"
+                    <gz_frame_id>navsat</gz_frame_id>
+                    <topic>
+                    scan</topic>
+                    <update_rate>
+                        10</update_rate>
+                    <ray>
+                        <scan>
+                            <horizontal>
+                                <samples>90</samples>
+                                <resolution>1</resolution>
+                                <min_angle>-1.57</min_angle>
+                                <max_angle>1.57</max_angle>
+                            </horizontal>
+                            <vertical>
+                                <samples>60</samples>
+                                <resolution>1</resolution>
+                                <min_angle>-1.05</min_angle>
+                                <max_angle>1.05</max_angle>
+                            </vertical>
+                        </scan>
+                        <range>
+                            <min>0.08</min>
+                            <max>10.0</max>
+                            <resolution>0.01</resolution>
+                        </range>
+                    </ray>
+                    <alwaysOn>
+                    1</alwaysOn>
+                    <visualize>true</visualize>
+                </sensor> -->
+            </link>
+
+
+            <link name='front_right_wheel'>
+                <pose> 1.238 -0.713 -0.75 -1.5707 0 0</pose>
+                <inertial>
+                    <mass>2</mass>
+                    <inertia>
+                        <ixx>0.145833</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>0.145833</iyy>
+                        <iyz>0</iyz>
+                        <izz>0.125</izz>
+                    </inertia>
+                </inertial>
+                <visual name='visual'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.175</length>
+                            <radius>0.285</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0.2 0.2 0.2 1</ambient>
+                        <diffuse>0.2 0.2 0.2 1</diffuse>
+                        <specular>0.2 0.2 0.2 1</specular>
+                    </material>
+                </visual>
+                <collision name='collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.175</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.5</mu>
+                                <mu2>1.0</mu2>
+                                <fdir1>0 0 1</fdir1>
+                            </ode>
+                            <bullet>
+                                <friction>0.5</friction>
+                                <friction2>1</friction2>
+                                <rolling_friction>0.1</rolling_friction>
+                            </bullet>
+                        </friction>
+                    </surface>
+                </collision>
+            </link>
+
+            <link name='front_left_wheel'>
+                <pose> 1.238 0.713 -0.75 -1.5707 0 0</pose>
+                <inertial>
+                    <mass>2</mass>
+                    <inertia>
+                        <ixx>0.145833</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>0.145833</iyy>
+                        <iyz>0</iyz>
+                        <izz>0.125</izz>
+                    </inertia>
+                </inertial>
+                <visual name='visual'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.175</length>
+                            <radius>0.285</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0.2 0.2 0.2 1</ambient>
+                        <diffuse>0.2 0.2 0.2 1</diffuse>
+                        <specular>0.2 0.2 0.2 1</specular>
+                    </material>
+                </visual>
+                <collision name='collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.175</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.5</mu>
+                                <mu2>1.0</mu2>
+                                <fdir1>0 0 1</fdir1>
+                            </ode>
+                            <bullet>
+                                <friction>0.5</friction>
+                                <friction2>1</friction2>
+                                <rolling_friction>0.1</rolling_friction>
+                            </bullet>
+                        </friction>
+                    </surface>
+                </collision>
+            </link>
+
+            <link name="front_left_wheel_steering_link">
+                <pose>1.238 0.625 -0.75 0 0 0</pose>
+                <inertial>
+                    <mass>0.5</mass>
+                    <inertia>
+                        <ixx>0.0153</ixx>
+                        <iyy>0.025</iyy>
+                        <izz>0.0153</izz>
+                    </inertia>
+                </inertial>
+                <visual name="steering_link_visual">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.1</length>
+                            <radius>0.03</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>1 1 1</ambient>
+                        <diffuse>1 1 1</diffuse>
+                    </material>
+                </visual>
+            </link>
+
+            <link name="front_right_wheel_steering_link">
+                <pose>1.238 -0.625 -0.75 0 0 0</pose>
+                <inertial>
+                    <mass>0.5</mass>
+                    <inertia>
+                        <ixx>0.0153</ixx>
+                        <iyy>0.025</iyy>
+                        <izz>0.0153</izz>
+                    </inertia>
+                </inertial>
+                <visual name="steering_link_visual">
+                    <pose>0 0 0 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.1</length>
+                            <radius>0.03</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>1 1 1</ambient>
+                        <diffuse>1 1 1</diffuse>
+                    </material>
+                </visual>
+            </link>
+
+            <link name='back_left_wheel'>
+                <pose> -1.238 0.713 -0.75 -1.5707 0 0</pose>
+                <inertial>
+                    <mass>2</mass>
+                    <inertia>
+                        <ixx>0.145833</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>0.145833</iyy>
+                        <iyz>0</iyz>
+                        <izz>0.125</izz>
+                    </inertia>
+                </inertial>
+                <visual name='visual'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.15</length>
+                            <radius>0.285</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0.2 0.2 0.2 1</ambient>
+                        <diffuse>0.2 0.2 0.2 1</diffuse>
+                        <specular>0.2 0.2 0.2 1</specular>
+                    </material>
+                </visual>
+                <collision name='collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.175</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.5</mu>
+                                <mu2>1.0</mu2>
+                                <fdir1>0 0 1</fdir1>
+                            </ode>
+                            <bullet>
+                                <friction>0.5</friction>
+                                <friction2>1</friction2>
+                                <rolling_friction>0.1</rolling_friction>
+                            </bullet>
+                        </friction>
+                    </surface>
+                </collision>
+            </link>
+
+            <link name='back_right_wheel'>
+                <pose> -1.238 -0.713 -0.75 -1.5707 0 0</pose>
+                <inertial>
+                    <mass>2</mass>
+                    <inertia>
+                        <ixx>0.145833</ixx>
+                        <ixy>0</ixy>
+                        <ixz>0</ixz>
+                        <iyy>0.145833</iyy>
+                        <iyz>0</iyz>
+                        <izz>0.125</izz>
+                    </inertia>
+                </inertial>
+                <visual name='visual'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.15</length>
+                            <radius>0.285</radius>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0.2 0.2 0.2 1</ambient>
+                        <diffuse>0.2 0.2 0.2 1</diffuse>
+                        <specular>0.2 0.2 0.2 1</specular>
+                    </material>
+                </visual>
+                <collision name='collision'>
+                    <geometry>
+                        <cylinder>
+                            <length>0.175</length>
+                            <radius>0.3</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.5</mu>
+                                <mu2>1.0</mu2>
+                                <fdir1>0 0 1</fdir1>
+                            </ode>
+                            <bullet>
+                                <friction>0.5</friction>
+                                <friction2>1</friction2>
+                                <rolling_friction>0.1</rolling_friction>
+                            </bullet>
+                        </friction>
+                    </surface>
+                </collision>
+            </link>
+
+
+            <joint name='front_left_wheel_joint' type='revolute'>
+                <parent>front_left_wheel_steering_link</parent>
+                <child>front_left_wheel</child>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                    <limit>
+                        <lower>-1.79769e+308</lower>
+                        <upper>1.79769e+308</upper>
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name='back_left_wheel_joint' type='revolute'>
+                <parent>chassis</parent>
+                <child>back_left_wheel</child>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                    <limit>
+                        <lower>-1.79769e+308</lower>
+                        <upper>1.79769e+308</upper>
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name='front_right_wheel_joint' type='revolute'>
+                <parent>front_right_wheel_steering_link</parent>
+                <child>front_right_wheel</child>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                    <limit>
+                        <lower>-1.79769e+308</lower>
+                        <upper>1.79769e+308</upper>
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name='back_right_wheel_joint' type='revolute'>
+                <parent>chassis</parent>
+                <child>back_right_wheel</child>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                    <limit>
+                        <lower>-1.79769e+308</lower>
+                        <upper>1.79769e+308</upper>
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name="front_left_wheel_steering_joint" type="revolute">
+                <child>front_left_wheel_steering_link</child>
+                <parent>chassis</parent>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                    <limit>
+                        <lower>-0.6</lower>
+                        <upper>+0.6</upper>
+                        <velocity>1.0</velocity>
+                        <effort>25</effort>
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name="front_right_wheel_steering_joint" type="revolute">
+                <parent>chassis</parent>
+                <child>front_right_wheel_steering_link</child>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                    <limit>
+                        <lower>-0.6</lower>
+                        <upper>+0.6</upper>
+                        <velocity>1.0</velocity>
+                        <effort>25</effort>
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name='navsat_joint' type='fixed'>
+                <parent>chassis</parent>
+                <child>navsat</child>
+            </joint>
+
+            <joint name='camera_joint' type='fixed'>
+                <parent>chassis</parent>
+                <child>front_camera_link</child>
+            </joint>
+
+
+            <plugin
+                filename="gz-sim-ackermann-steering-system"
+                name="gz::sim::systems::AckermannSteering">
+                <left_joint>front_left_wheel_joint</left_joint>
+                <left_joint>back_left_wheel_joint</left_joint>
+                <right_joint>front_right_wheel_joint</right_joint>
+                <right_joint>back_right_wheel_joint</right_joint>
+                <left_steering_joint>front_left_wheel_steering_joint</left_steering_joint>
+                <right_steering_joint>front_right_wheel_steering_joint</right_steering_joint>
+                <kingpin_width>1.0</kingpin_width>
+                <steering_limit>0.5</steering_limit>
+                <wheel_base>1.0</wheel_base>
+                <wheel_separation>1.25</wheel_separation>
+                <wheel_radius>0.3</wheel_radius>
+                <min_velocity>-1</min_velocity>
+                <max_velocity>1</max_velocity>
+                <min_acceleration>-3</min_acceleration>
+                <max_acceleration>3</max_acceleration>
+            </plugin>
+
+
+            <!-- ////////////////////////////-->
+            <!-- ////////////////////////////-->
+            <!-- ODOMETRY PLUGIN -->
+            <!-- ////////////////////////////-->
+            <!-- ////////////////////////////-->
+            <plugin filename="gz-sim-odometry-publisher-system"
+                name="gz::sim::systems::OdometryPublisher">
+                <odom_frame>odom</odom_frame>
+                <robot_base_frame>chassis</robot_base_frame>
+                <odom_publish_frequency>50</odom_publish_frequency>
+                <odom_topic>/odometry</odom_topic>
+                <odom_covariance_topic>/odometry_with_covariance</odom_covariance_topic>
+                <tf_topic>/tf</tf_topic>
+                <dimensions>2</dimensions>
+            </plugin>
+
+
+            <!-- ////////////////////////////-->
+            <!-- ////////////////////////////-->
+            <!-- JOINT STATE PUBLISHER PLUGIN -->
+            <!-- ////////////////////////////-->
+            <!-- ////////////////////////////-->
+            <plugin filename="gz-sim-joint-state-publisher-system"
+                name="gz::sim::systems::JointStatePublisher">
+                <joint_name>back_right_wheel_joint</joint_name>
+                <joint_name>back_left_wheel_joint</joint_name>
+                <joint_name>front_right_wheel_joint</joint_name>
+                <joint_name>front_left_wheel_joint</joint_name>
+                <joint_name>front_right_wheel_steering_joint</joint_name>
+                <joint_name>front_left_wheel_steering_joint</joint_name>
+                <!-- <joint_name>lidar_joint</joint_name>
+        <joint_name>camera_joint</joint_name> -->
+                <topic>/joint_states</topic>
+            </plugin>
+
+
+            <plugin
+                filename="gz-sim-pose-publisher-system"
+                name="gz::sim::systems::PosePublisher">
+                <publish_link_pose>true</publish_link_pose>
+                <publish_collision_pose>false</publish_collision_pose>
+                <publish_visual_pose>false</publish_visual_pose>
+                <publish_nested_model_pose>false</publish_nested_model_pose>
+                <publish_sensor_pose>true</publish_sensor_pose>
+            </plugin>
+
+
+        </model>
+
+
+    </world>
+</sdf>

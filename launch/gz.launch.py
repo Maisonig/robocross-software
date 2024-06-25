@@ -18,7 +18,7 @@ def generate_launch_description():
         launch_arguments={'gz_args': PathJoinSubstitution([
             package_path,
             'model',
-            'polygon.sdf.xml'
+            'robocross_trial.sdf.xml'
         ])}.items(),
     )
 

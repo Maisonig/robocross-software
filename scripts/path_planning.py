@@ -65,7 +65,7 @@ class PathPlanner(Node):
             rclpy.Parameter('grid_resolution', rclpy.Parameter.Type.DOUBLE, 0.1),
         ]
 
-        self.set_parameters(params)
+        # self.set_parameters(params)
 
         global_grid_topic = self.get_parameter('global_grid_topic').get_parameter_value().string_value
         odom_topic = self.get_parameter('odom_topic').get_parameter_value().string_value

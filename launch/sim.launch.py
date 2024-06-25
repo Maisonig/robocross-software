@@ -15,10 +15,6 @@ def generate_launch_description():
         launch_description_source=os.path.join(launch_path, 'gz.launch.py')
     )
 
-    action_robot_localization_ekf_launch = IncludeLaunchDescription(
-        launch_description_source=os.path.join(launch_path, 'robot_localization_ekf.launch.py')
-    )
-
     action_rviz_launch = IncludeLaunchDescription(
         launch_description_source=os.path.join(launch_path, 'state_publisher.launch.py')
     )
@@ -30,17 +26,10 @@ def generate_launch_description():
         parameters=[param_file]
     )
 
-    action_local_mapping = Node(
+    action_mapping = Node(
         package='car_bot',
-        executable='local_mapping.py',
-        name='local_mapping',
-        parameters=[param_file]
-    )
-
-    action_global_mapping = Node(
-        package='car_bot',
-        executable='global_mapping.py',
-        name='global_mapping',
+        executable='mapping.py',
+        name='mapping',
         parameters=[param_file]
     )
 
@@ -61,10 +50,8 @@ def generate_launch_description():
     ld = LaunchDescription()
     ld.add_action(action_simulation_launch)
     ld.add_action(action_rviz_launch)
-    # ld.add_action(action_robot_localization_ekf_launch)
     ld.add_action(action_front_cloud_to_scan)
-    ld.add_action(action_local_mapping)
-    # ld.add_action(action_global_mapping)
+    ld.add_action(action_mapping)
     ld.add_action(action_path_planning)
     ld.add_action(action_path_controller)
     return ld

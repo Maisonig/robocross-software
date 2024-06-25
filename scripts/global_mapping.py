@@ -98,7 +98,7 @@ class GlobalMapper(Node):
             rclpy.Parameter('grid_resolution', rclpy.Parameter.Type.DOUBLE, 0.1),
         ]
 
-        self.set_parameters(params)
+        # self.set_parameters(params)
 
         frequency = self.get_parameter('frequency').get_parameter_value().integer_value
         odom_topic = self.get_parameter('odom_topic').get_parameter_value().string_value

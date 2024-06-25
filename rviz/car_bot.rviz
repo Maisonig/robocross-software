@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /FrontCamera1
+        - /Path1
       Splitter Ratio: 0.5
     Tree Height: 746
   - Class: rviz_common/Selection
@@ -195,46 +196,25 @@ Visualization Manager:
           Value: true
       Enabled: true
       Name: FrontCamera
-    - Alpha: 0.8999999761581421
-      Class: rviz_default_plugins/Map
-      Color Scheme: map
-      Draw Behind: false
-      Enabled: false
-      Name: LocalMap
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /local_map
-      Update Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /local_map_updates
-      Use Timestamp: false
-      Value: false
-    - Alpha: 0.4000000059604645
+    - Alpha: 0.699999988079071
       Class: rviz_default_plugins/Map
       Color Scheme: map
       Draw Behind: false
       Enabled: true
-      Name: GlobalMap
+      Name: Map
       Topic:
         Depth: 5
         Durability Policy: Volatile
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /global_map
+        Value: /map
       Update Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /global_map_updates
+        Value: /map_updates
       Use Timestamp: false
       Value: true
     - Alpha: 1
@@ -246,7 +226,7 @@ Visualization Manager:
       Head Length: 0.20000000298023224
       Length: 0.30000001192092896
       Line Style: Billboards
-      Line Width: 0.10000000149011612
+      Line Width: 0.05000000074505806
       Name: Path
       Offset:
         X: 0
@@ -265,10 +245,30 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /path
       Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz_default_plugins/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Arrow
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /goal_pose
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: base_footprint
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
@@ -311,25 +311,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 26.636070251464844
+      Distance: 14.750008583068848
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 3.9779458045959473
-        Y: 0.6360289454460144
-        Z: 1.4941869974136353
+        X: 5.862145900726318
+        Y: -0.525517463684082
+        Z: -0.550145149230957
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.1297963857650757
+      Pitch: 1.0647965669631958
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.575422763824463
+      Yaw: 3.0535922050476074
     Saved: ~
 Window Geometry:
   Displays:

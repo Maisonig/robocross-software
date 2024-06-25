@@ -45,6 +45,8 @@ install(PROGRAMS
   scripts/camera_driver.py
   scripts/pathfinding.py
   scripts/path_controller.py
+  scripts/mapping.py
+  scripts/utils.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
