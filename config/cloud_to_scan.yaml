@@ -1,0 +1,18 @@
+cloud_to_scan:
+  ros__parameters:
+    use_sim_time: False
+    frame_id: laser_link
+    pointcloud_topic: /points
+    scan_topic: /scan
+    frequency: 30
+    x_max: 10.
+    x_min: .6
+    y_max: 20.
+    y_min: -20.
+    z_max: .25
+    z_min: .2
+    angle_max: 0.52
+    angle_min: -0.52
+    rays_number: 60
+
+

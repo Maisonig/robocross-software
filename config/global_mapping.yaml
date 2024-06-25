@@ -1,0 +1,10 @@
+global_mapping:
+  ros__parameters:
+    frequency: 30
+    odom_topic: /odom
+    local_grid_topic: /local_map
+    global_grid_topic: /global_map
+    global_grid_frame: map
+    robot_frame: chassis
+    grid_size: 500
+    grid_resolution: 0.1

@@ -1,0 +1,59 @@
+front_cloud_to_scan:
+  ros__parameters:
+    use_sim_time: False
+    frame_id: front_camera_link
+    pointcloud_topic: /front_camera/points
+    scan_topic: /front_camera/scan
+    frequency: 30
+    x_max: 10.
+    x_min: .6
+    y_max: 20.
+    y_min: -20.
+    z_max: -0.05
+    z_min: -0.20
+    angle_max: 0.785
+    angle_min: -0.785
+    rays_number: 120
+
+local_mapping:
+  ros__parameters:
+    frequency: 30
+    front_detection_topic: /front_camera/detection
+    back_detection_topic: /back_camera/detection
+    front_depth_topic: /front_camera/depth
+    back_depth_topic: /back_camera/depth
+    front_scan_topic: /front_camera/scan
+    back_scan_topic: /back_camera/scan
+    odom_topic: /odom
+    grid_topic: /local_map
+    robot_frame: base_footprint
+    robot_radius: 2.0
+    front_camera_frame: front_camera_link
+    back_camera_frame: back_camera_link
+    grid_size: 30
+    grid_resolution: 0.1
+
+global_mapping:
+  ros__parameters:
+    frequency: 30
+    odom_topic: /odom
+    local_grid_topic: /local_map
+    global_grid_topic: /global_map
+    global_grid_frame: map
+    robot_frame: chassis
+    grid_size: 120
+    grid_resolution: 0.1
+
+path_planning:
+  ros__parameters:
+    frequency: 30
+    global_grid_topic: /global_map
+    odom_topic: /odom
+    goal_topic: /goal_pose
+    path_topic: /path
+    robot_collision_radius: 1.5
+    goal_radius: 3.
+    steering_value: 0.12
+    path_discrete: 0.5
+    robot_base_frame: map
+    grid_resolution: 0.1

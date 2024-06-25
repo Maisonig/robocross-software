@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="car-bot">
+
+  <material name="light_gray">
+    <color rgba="0.93 0.93 1 1" />
+  </material>
+
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <material name="dark_gray">
+    <color rgba="0.2 0.2 0.2 1"/>
+  </material>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 3.1415" />
+      <geometry>
+        <mesh filename="package://car_bot/model/car_bot.stl" scale="0.3 0.3 0.3"/>
+      </geometry>
+      <material name="light_gray"/>
+    </visual>
+  </link>
+
+  <link name="left_urglidar">
+    <visual>
+      <geometry>
+        <cylinder length="0.1" radius="0.06"/>
+      </geometry>
+      <material name="dark_gray"/>
+    </visual>
+  </link>
+
+  <link name="right_urglidar">
+    <visual>
+      <geometry>
+        <cylinder length="0.1" radius="0.06"/>
+      </geometry>
+      <material name="dark_gray"/>
+    </visual>
+  </link>
+
+  <link name="rslidar">
+    <visual>
+      <geometry>
+        <cylinder length="0.15" radius="0.1"/>
+      </geometry>
+      <material name="dark_gray"/>
+    </visual>
+  </link>
+
+  <link name="imu">
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <joint name="left_urglidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_urglidar"/>
+    <origin rpy="0 0 1.57075" xyz="-0.85 1.8 0.2"/>
+  </joint>
+
+  <joint name="right_urglidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_urglidar"/>
+    <origin rpy="0 0 -1.57075" xyz="0.85 1.8 0.2"/>
+  </joint>
+
+  <joint name="rslidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="rslidar"/>
+    <origin rpy="0 0 0" xyz="0.0 0.0 1.55"/>
+  </joint>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu"/>
+    <origin rpy="0 0 0" xyz="0.0 0.5 1.25"/>
+  </joint>
+
+</robot>
