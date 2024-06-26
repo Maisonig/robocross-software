@@ -3570,12 +3570,12 @@
                 <left_steering_joint>front_left_wheel_steering_joint</left_steering_joint>
                 <right_steering_joint>front_right_wheel_steering_joint</right_steering_joint>
                 <kingpin_width>1.0</kingpin_width>
-                <steering_limit>0.5</steering_limit>
+                <steering_limit>0.715</steering_limit>
                 <wheel_base>1.0</wheel_base>
-                <wheel_separation>1.25</wheel_separation>
-                <wheel_radius>0.3</wheel_radius>
-                <min_velocity>-1</min_velocity>
-                <max_velocity>1</max_velocity>
+                <wheel_separation>1.4</wheel_separation>
+                <wheel_radius>0.285</wheel_radius>
+                <min_velocity>-2.5</min_velocity>
+                <max_velocity>2.5</max_velocity>
                 <min_acceleration>-3</min_acceleration>
                 <max_acceleration>3</max_acceleration>
             </plugin>

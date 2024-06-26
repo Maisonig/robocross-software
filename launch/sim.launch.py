@@ -47,11 +47,19 @@ def generate_launch_description():
         parameters=[param_file]
     )
 
+    action_waypoint_following = Node(
+        package='car_bot',
+        executable='waypoint_following.py',
+        name='waypoint_following',
+        parameters=[param_file]
+    )
+
     ld = LaunchDescription()
     ld.add_action(action_simulation_launch)
     ld.add_action(action_rviz_launch)
     ld.add_action(action_front_cloud_to_scan)
     ld.add_action(action_mapping)
-    # ld.add_action(action_path_planning)
-    # ld.add_action(action_path_controller)
+    ld.add_action(action_path_planning)
+    ld.add_action(action_path_controller)
+    ld.add_action(action_waypoint_following)
     return ld

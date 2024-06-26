@@ -60,7 +60,7 @@ class Grid:
         self.parent = np.zeros_like(arr, dtype=tuple)
 
     def init_grid(self, arr):
-        self.grid = arr
+        self.grid = np.array(arr, dtype=np.float32)
         self.heuristic = np.zeros_like(arr, dtype=np.float32)
         self.pass_weight = np.zeros_like(arr, dtype=np.float32)
         self.weight = np.zeros_like(arr, dtype=np.float32)
@@ -76,7 +76,7 @@ class Grid:
         for r, th, p_w in self.neighbours:
             th = self.dir[node[1], node[0]] + th
             x, y = polar_to_decart(r, th)
-            x, y = int(x), int(y)
+            x, y = round(x), round(y)
             neighbour = [node[0] + x, node[1] + y]
             try:
                 self.pass_weight[neighbour[1], neighbour[0]] = p_w
@@ -173,7 +173,7 @@ class AstarFinder:
 
             # Если за время таймаута путь не обнаружен, прерываем цикл и ничего не возвращаем
             if time.time() > start_time + self.timeout:
-                # return "Timeout"
+                return "Timeout"
                 pass
 
             neighbours = grid.get_neighbours(current)
@@ -185,7 +185,7 @@ class AstarFinder:
                     pass
                 else:
                     heuristic = get_euclidian(abs(x - x1), abs(y - y1))
-                    total = heuristic + grid.pass_weight[y, x] + grid_weight
+                    total = heuristic + grid.pass_weight[y, x] + grid_weight * 1000
                     if total < grid.weight[current[1], current[0]] or not grid.visited[y, x]:
                         grid.heuristic[y, x] = heuristic
                         grid.weight[y, x] = total
@@ -194,3 +194,18 @@ class AstarFinder:
                             grid.visited[y, x] = True
                             open_list.append(neighbour)
                             open_list_weights.append(total)
+
+
+# a = np.zeros((100, 100), dtype=np.uint8)
+# cv2.circle(a, [50, 50], 40, [70], -1)
+# gr = Grid(np.copy(a), 0.24, 5)
+# finder = AstarFinder(5, 1, 20)
+#
+# path = finder.get_path(gr, [15, 15, 0], [85, 85])
+# if type(path) is list:
+#     for p in path:
+#         cv2.circle(a, [p[0], p[1]], 2, [255], -1)
+# else:
+#     print(path)
+# cv2.imshow('Image', a)
+# cv2.waitKey(0)

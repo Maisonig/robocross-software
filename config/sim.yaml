@@ -5,12 +5,12 @@ front_cloud_to_scan:
     pointcloud_topic: /front_camera/points
     scan_topic: /front_camera/scan
     frequency: 30
-    x_max: 30.
+    x_max: 20.
     x_min: .6
     y_max: 20.
     y_min: -20.
-    z_max: -0.05
-    z_min: -0.20
+    z_max: 0.0
+    z_min: -0.25
     angle_max: 0.785
     angle_min: -0.785
     rays_number: 120
@@ -23,7 +23,7 @@ mapping:
     odom_topic: /odom
     map_topic: /map
     robot_base_frame: chassis
-    robot_collision_radius: 2.0
+    robot_collision_radius: 2.5
     map_size: 150
     map_resolution: 0.1
     map_frame: map
@@ -37,9 +37,18 @@ path_planning:
     odom_topic: /odom
     goal_topic: /goal_pose
     path_topic: /path
-    robot_collision_radius: 1.0
+    robot_collision_radius: 1.5
     goal_radius: 2.
-    steering_value: 0.12
-    path_discrete: 0.5
+    steering_value: 0.24 # не ставить меньше 0.2
+    path_discrete: 0.99
     robot_base_frame: map
     grid_resolution: 0.1
+
+waypoint_following:
+  ros__parameters:
+    frequency: 30
+    odom_topic: /odom
+    goal_topic: /goal_pose
+    waypoints: [19.8653, -10.3495, 29.2345, -23.4966]
+    map_frame: map
+#    start_following: False

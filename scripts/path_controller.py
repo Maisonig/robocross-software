@@ -71,7 +71,7 @@ class PathController(Node):
         self.odomData = msg
 
     def timer_callback(self):
-        if self.pathData != Path() and self.odomData != Odometry():
+        if self.pathData.poses != [] and self.odomData != Odometry():
             if len(self.pathData.poses) > 3:
                 pose = self.pathData.poses[2]
                 vel = 0.3
@@ -88,7 +88,7 @@ class PathController(Node):
                 steer = z0 - z
                 msg = Twist()
                 msg.linear.x = 2.5
-                msg.angular.z = -2 * steer
+                msg.angular.z = -2.3 * steer
                 self.cmdPub.publish(msg)
             else:
                 msg = Twist()

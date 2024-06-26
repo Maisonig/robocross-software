@@ -40,7 +40,7 @@ class PathPlanner(Node):
         super().__init__(node_name)
 
         self.declare_parameter('frequency', 30)
-        self.declare_parameter('global_grid_topic', '/global_map')
+        self.declare_parameter('global_grid_topic', '/map')
         self.declare_parameter('odom_topic', '/odom')
         self.declare_parameter('goal_topic', '/goal_pose')
         self.declare_parameter('path_topic', '/path')
@@ -127,7 +127,7 @@ class PathPlanner(Node):
                     # Поиск пути
                     st = time.time()
                     path = self.finder.get_path(self.grid, (x1, y1, th), (x2, y2))
-                    self.get_logger().info(str(time.time() - st))
+                    # self.get_logger().info(str(time.time() - st))
                     # Если путь найден
                     if type(path) is list:
                         self.publish_path(path, g.shape)
