@@ -77,7 +77,7 @@ class CloudToScan(Node):
             rclpy.Parameter('frame_id', rclpy.Parameter.Type.STRING, 'front_camera_link'),
         ]
 
-        self.set_parameters(params)
+        # self.set_parameters(params)
 
         self.xMax = self.get_parameter('x_max').get_parameter_value().double_value
         self.xMin = self.get_parameter('x_min').get_parameter_value().double_value

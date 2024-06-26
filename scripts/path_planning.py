@@ -39,33 +39,17 @@ class PathPlanner(Node):
     def __init__(self, node_name: str):
         super().__init__(node_name)
 
-        self.declare_parameter('frequency', rclpy.Parameter.Type.INTEGER)
-        self.declare_parameter('global_grid_topic', rclpy.Parameter.Type.STRING)
-        self.declare_parameter('odom_topic', rclpy.Parameter.Type.STRING)
-        self.declare_parameter('goal_topic', rclpy.Parameter.Type.STRING)
-        self.declare_parameter('path_topic', rclpy.Parameter.Type.STRING)
-        self.declare_parameter('robot_base_frame', rclpy.Parameter.Type.STRING)
-        self.declare_parameter('grid_resolution', rclpy.Parameter.Type.DOUBLE)
-        self.declare_parameter('robot_collision_radius', rclpy.Parameter.Type.DOUBLE)
-        self.declare_parameter('goal_radius', rclpy.Parameter.Type.DOUBLE)
-        self.declare_parameter('steering_value', rclpy.Parameter.Type.DOUBLE)
-        self.declare_parameter('path_discrete', rclpy.Parameter.Type.DOUBLE)
-
-        params = [
-            rclpy.Parameter('frequency', rclpy.Parameter.Type.INTEGER, 30),
-            rclpy.Parameter('odom_topic', rclpy.Parameter.Type.STRING, '/odom'),
-            rclpy.Parameter('goal_topic', rclpy.Parameter.Type.STRING, '/goal_pose'),
-            rclpy.Parameter('global_grid_topic', rclpy.Parameter.Type.STRING, '/global_map'),
-            rclpy.Parameter('robot_base_frame', rclpy.Parameter.Type.STRING, 'map'),
-            rclpy.Parameter('path_topic', rclpy.Parameter.Type.STRING, '/path'),
-            rclpy.Parameter('robot_collision_radius', rclpy.Parameter.Type.DOUBLE, 2.),
-            rclpy.Parameter('goal_radius', rclpy.Parameter.Type.DOUBLE, 3.),
-            rclpy.Parameter('steering_value', rclpy.Parameter.Type.DOUBLE, 0.12),
-            rclpy.Parameter('path_discrete', rclpy.Parameter.Type.DOUBLE, .5),
-            rclpy.Parameter('grid_resolution', rclpy.Parameter.Type.DOUBLE, 0.1),
-        ]
-
-        # self.set_parameters(params)
+        self.declare_parameter('frequency', 30)
+        self.declare_parameter('global_grid_topic', '/global_map')
+        self.declare_parameter('odom_topic', '/odom')
+        self.declare_parameter('goal_topic', '/goal_pose')
+        self.declare_parameter('path_topic', '/path')
+        self.declare_parameter('robot_base_frame', 'map')
+        self.declare_parameter('grid_resolution', 0.1)
+        self.declare_parameter('robot_collision_radius', 1.0)
+        self.declare_parameter('goal_radius', 3.)
+        self.declare_parameter('steering_value', 0.12)
+        self.declare_parameter('path_discrete', 0.5)
 
         global_grid_topic = self.get_parameter('global_grid_topic').get_parameter_value().string_value
         odom_topic = self.get_parameter('odom_topic').get_parameter_value().string_value
@@ -102,7 +86,7 @@ class PathPlanner(Node):
         self.mapData = OccupancyGrid()
         self.goalData = PoseStamped()
 
-        self.grid = Grid(np.zeros((10, 10)), self.steeringVal, self.pathDiscrete / self.gridRes)
+        self.grid = Grid(np.zeros((1, 1)), self.steeringVal, self.pathDiscrete / self.gridRes)
         self.finder = AstarFinder(self.robotCollisionRad / self.gridRes,
                                   2,
                                   self.goalRad / self.gridRes)

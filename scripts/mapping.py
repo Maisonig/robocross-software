@@ -2,133 +2,135 @@
 
 import cv2
 import time
-import math
 import rclpy
 import numpy as np
 import ros2_numpy as rnp
-from builtin_interfaces.msg import Time
+
 from utils import *
-
 from rclpy.node import Node
+from sensor_msgs.msg import LaserScan
+from tf2_ros import TransformBroadcaster
+from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import OccupancyGrid, Odometry
-from sensor_msgs.msg import PointCloud2, LaserScan, Image
-from geometry_msgs.msg import TransformStamped, Polygon
-from tf2_py import TransformException
-from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster, Buffer, TransformListener
-
-UNKNOWN_CELL = -1
-FREE_CELL = 0
-OBSTACLE_CELL = 100
-
-focalX = 1451
-focalY = 2312
-centerX = 640
-centerY = 360
-cameraDefaultIntrinsics = [[3056.9775390625, 0.0, 1870.62060546875],
-                           [0.0, 3056.9775390625, 1087.102294921875],
-                           [0.0, 0.0, 1.0]]
-
-
-def transform_image_coord(u, depth):
-    dmx = np.sqrt((centerX - u) ** 2 + focalX ** 2)
-    y = depth * (centerX - u) / dmx
-    x = depth
-    return x, y
 
 
 class Mapping(Node):
+
     RELEVANT_DATA_TIMEOUT = 2.
+    UNKNOWN_CELL = 255
+    FREE_CELL = 0
+    OBSTACLE_CELL = 100
 
     def __init__(self, node_name: str):
         super().__init__(node_name)
 
         self.declare_parameter('frequency', 30)
-        self.declare_parameter('scan_topic', '/front_camera/scan')
+        self.declare_parameter('front_scan_topic', '/front_camera/scan')
+        self.declare_parameter('rear_scan_topic', '/rear_camera/scan')
         self.declare_parameter('odom_topic', '/odom')
         self.declare_parameter('map_topic', '/map')
         self.declare_parameter('robot_base_frame', 'chassis')
-        self.declare_parameter('scan_frame', 'front_camera_link')
-        self.declare_parameter('map_size', 100)
+        self.declare_parameter('map_size', 150)
         self.declare_parameter('map_resolution', 0.1)
         self.declare_parameter('map_frame', 'map')
-        self.declare_parameter('robot_collision_radius', 1.)
+        self.declare_parameter('robot_collision_radius', 2.)
+        self.declare_parameter('front_scan_position', [2.2, 0.0, 0.0])
+        self.declare_parameter('rear_scan_position', [-2.2, 0.0, 0.0])
 
         freq = self.get_parameter('frequency').get_parameter_value().integer_value
-        scan_topic = self.get_parameter('scan_topic').get_parameter_value().string_value
+        front_scan_topic = self.get_parameter('front_scan_topic').get_parameter_value().string_value
+        rear_scan_topic = self.get_parameter('rear_scan_topic').get_parameter_value().string_value
         odom_topic = self.get_parameter('odom_topic').get_parameter_value().string_value
         map_topic = self.get_parameter('map_topic').get_parameter_value().string_value
 
         self.robotBaseFrame = self.get_parameter('robot_base_frame').get_parameter_value().string_value
-        self.scanFrame = self.get_parameter('scan_frame').get_parameter_value().string_value
         self.mapFrame = self.get_parameter('map_frame').get_parameter_value().string_value
         self.mapSize = self.get_parameter('map_size').get_parameter_value().integer_value
         self.mapRes = self.get_parameter('map_resolution').get_parameter_value().double_value
         self.robotColRadius = self.get_parameter('robot_collision_radius').get_parameter_value().double_value
+        self.frontScanPos = self.get_parameter('front_scan_position').get_parameter_value().double_array_value
+        self.rearScanPos = self.get_parameter('rear_scan_position').get_parameter_value().double_array_value
 
         self.mainTimer = self.create_timer(1 / freq, self.main_timer_callback)
-        self.scanSub = self.create_subscription(LaserScan, scan_topic, self.scan_callback, 10)
+        self.frontScanSub = self.create_subscription(LaserScan, front_scan_topic, self.front_scan_callback, 10)
+        self.rearScanSub = self.create_subscription(LaserScan, rear_scan_topic, self.rear_scan_callback, 10)
         self.odomSub = self.create_subscription(Odometry, odom_topic, self.odom_callback, 10)
         self.mapPub = self.create_publisher(OccupancyGrid, map_topic, 10)
-        self.tfBuffer = Buffer()
-        self.tfListener = TransformListener(self.tfBuffer, self)
         self.tfBroadcaster = TransformBroadcaster(self)
 
         self.odomData = Odometry()
-        self.scanData = LaserScan()
+        self.frontScanData = LaserScan()
+        self.rearScanData = LaserScan()
         self.mapArray = np.zeros([int(self.mapSize / self.mapRes), int(self.mapSize / self.mapRes)], np.uint8) + 127
 
     def main_timer_callback(self):
         self.publish_tf()
-        map_center = self.mapSize / 2 / self.mapRes
-        if self.scanData != LaserScan() and self.odomData != Odometry():
+
+        start_time = time.time()
+
+        self.set_scan(self.frontScanData, self.frontScanPos)
+        self.set_scan(self.rearScanData, self.rearScanPos)
+        self.set_obstacles()
+
+        print(1 / (time.time() - start_time))
+
+        self.publish_map()
+
+    def set_obstacles(self):
+        indexes = np.where(self.mapArray == 0)
+        ys, xs = indexes[0], indexes[1]
+        for a, b in zip(xs, ys):
+            cv2.circle(self.mapArray, [a, b], int(self.robotColRadius / self.mapRes), [70], -1)
+        for a, b in zip(xs, ys):
             try:
-                transform = self.tfBuffer.lookup_transform(self.mapFrame, self.scanFrame, Time()).transform
-                sensor_yaw = euler_from_quaternion(
-                    transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w)[2]
-                sensor_x, sensor_y = transform.translation.x, transform.translation.y
-                sensor_x, sensor_y = int(sensor_x / self.mapRes + map_center), int(sensor_y / self.mapRes + map_center)
-                self.set_scan(self.scanData, sensor_x, sensor_y, sensor_yaw)
-                self.publish_map()
-            except TransformException as e:
-                # self.get_logger().info(f'Could not transform {self.mapFrame} to {self.scanFrame}: {e}')
-                pass
-        else:
-            # self.get_logger().info(f'Could not get odometry/laserscan')
-            pass
+                self.mapArray[b, a] = 0
+            except IndexError:
+                self.get_logger().info('Robot sensor vision is out of bounds')
+                break
 
-    def set_scan(self, scan_msg, base_x, base_y, base_yaw):
-        base_yaw += scan_msg.angle_min
-        angles = [base_yaw + i * scan_msg.angle_increment for i in range(len(scan_msg.ranges))]
+    def set_scan(self, scan_msg, scan_pos):
+        if scan_msg != LaserScan() and self.odomData != Odometry():
+            map_center = self.mapSize / 2 / self.mapRes
+            rho, th = decart_to_polar(scan_pos[0] / self.mapRes, scan_pos[1] / self.mapRes)
+            q = self.odomData.pose.pose.orientation
+            base_yaw = euler_from_quaternion(q.x, q.y, q.z, q.w)[2]
+            sensor_x, sensor_y = polar_to_decart(rho, base_yaw)
+            base_x = int(map_center + self.odomData.pose.pose.position.x / self.mapRes + sensor_x)
+            base_y = int(map_center + self.odomData.pose.pose.position.y / self.mapRes + sensor_y)
+            base_yaw += scan_msg.angle_min
+            angles = [base_yaw + i * scan_msg.angle_increment for i in range(len(scan_msg.ranges))]
 
-        non_empty_ranges = []
-        non_empty_angles = []
-        for rho, phi in zip(scan_msg.ranges, angles):
-            if rho != 0.:
-                non_empty_ranges.append(rho)
-                non_empty_angles.append(phi)
-            else:
-                rho = scan_msg.range_max
+            non_empty_ranges = []
+            non_empty_angles = []
+            for rho, phi in zip(scan_msg.ranges, angles):
+                if rho != 0.:
+                    non_empty_ranges.append(rho)
+                    non_empty_angles.append(phi)
+                else:
+                    rho = scan_msg.range_max
+                    x, y = polar_to_decart(rho / self.mapRes, phi)
+                    x = int(x + base_x)
+                    y = int(y + base_y)
+                    cv2.line(self.mapArray, [base_x, base_y], [x, y], [255], 1)
+            for rho, phi in zip(non_empty_ranges, non_empty_angles):
                 x, y = polar_to_decart(rho / self.mapRes, phi)
                 x = int(x + base_x)
                 y = int(y + base_y)
                 cv2.line(self.mapArray, [base_x, base_y], [x, y], [255], 1)
-        circles = []
-        for rho, phi in zip(non_empty_ranges, non_empty_angles):
-            x, y = polar_to_decart(rho / self.mapRes, phi)
-            x = int(x + base_x)
-            y = int(y + base_y)
-            cv2.line(self.mapArray, [base_x, base_y], [x, y], [255], 1)
-            circles.append([x, y])
-        for c in circles:
-            cv2.circle(self.mapArray, c, int(self.robotColRadius / self.mapRes), [70], -1)
-        for c in circles:
-            self.mapArray[c[1], c[0]] = 0
+                try:
+                    self.mapArray[y, x] = 0
+                except IndexError:
+                    self.get_logger().info('Robot sensor vision is out of bounds')
+                    break
+        else:
+            # self.get_logger().info(f"Laserscan message from {} is empty")
+            pass
 
     def publish_map(self):
         oc_array = np.copy(self.mapArray)
-        oc_array[oc_array == 0] = 100
-        oc_array[oc_array == 255] = 0
-        oc_array[oc_array == 127] = 255
+        oc_array[oc_array == 0] = self.OBSTACLE_CELL
+        oc_array[oc_array == 255] = self.FREE_CELL
+        oc_array[oc_array == 127] = self.UNKNOWN_CELL
         oc_array = np.array(oc_array, np.int8)
         grid = rnp.msgify(OccupancyGrid, oc_array)
         grid.header.stamp = self.get_clock().now().to_msg()
@@ -149,8 +151,11 @@ class Mapping(Node):
         msg.transform.rotation = self.odomData.pose.pose.orientation
         self.tfBroadcaster.sendTransform(msg)
 
-    def scan_callback(self, msg):
-        self.scanData = msg
+    def front_scan_callback(self, msg):
+        self.frontScanData = msg
+
+    def rear_scan_callback(self, msg):
+        self.rearScanData = msg
 
     def odom_callback(self, msg):
         self.odomData = msg

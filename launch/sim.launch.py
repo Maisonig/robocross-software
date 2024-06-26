@@ -52,6 +52,6 @@ def generate_launch_description():
     ld.add_action(action_rviz_launch)
     ld.add_action(action_front_cloud_to_scan)
     ld.add_action(action_mapping)
-    ld.add_action(action_path_planning)
-    ld.add_action(action_path_controller)
+    # ld.add_action(action_path_planning)
+    # ld.add_action(action_path_controller)
     return ld
