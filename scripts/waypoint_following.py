@@ -23,6 +23,7 @@ class WaypointFollowing(Node):
         self.declare_parameter('frequency', 30)
         self.declare_parameter('odom_topic', '/odom')
         self.declare_parameter('goal_topic', '/goal_pose')
+        self.declare_parameter('goal_radius', 5.0)
         self.declare_parameter('waypoints', [19.8653, -10.3495, 29.2345, -23.4966])
         self.declare_parameter('map_frame', 'map')
         self.declare_parameter('start_following', False)
@@ -32,6 +33,7 @@ class WaypointFollowing(Node):
         frequency = self.get_parameter('frequency').get_parameter_value().integer_value
         points = self.get_parameter('waypoints').get_parameter_value().double_array_value
         self.mapFrame = self.get_parameter('map_frame').get_parameter_value().string_value
+        self.goalRad = self.get_parameter('goal_radius').get_parameter_value().double_value
         self.isStart = False
         self.waypoints = []
         j = 0
@@ -70,7 +72,7 @@ class WaypointFollowing(Node):
                 self.goalPub.publish(self.goalData)
                 self.pubFlg = True
             else:
-                if is_in_goal(self.odomData, self.goalData, 3.):
+                if is_in_goal(self.odomData, self.goalData, self.goalRad):
                     self.get_logger().info("Goal reached!")
                     self.pubFlg = False
                     self.waypoints.pop(0)

@@ -50,6 +50,7 @@ class PathPlanner(Node):
         self.declare_parameter('goal_radius', 3.)
         self.declare_parameter('steering_value', 0.12)
         self.declare_parameter('path_discrete', 0.5)
+        self.declare_parameter('timeout', 1.0)
 
         global_grid_topic = self.get_parameter('global_grid_topic').get_parameter_value().string_value
         odom_topic = self.get_parameter('odom_topic').get_parameter_value().string_value
@@ -63,6 +64,7 @@ class PathPlanner(Node):
         self.goalRad = self.get_parameter('goal_radius').get_parameter_value().double_value
         self.steeringVal = self.get_parameter('steering_value').get_parameter_value().double_value
         self.pathDiscrete = self.get_parameter('path_discrete').get_parameter_value().double_value
+        self.timeout = self.get_parameter('timeout').get_parameter_value().double_value
 
         self.globalMapSub = self.create_subscription(OccupancyGrid,
                                                      global_grid_topic,
@@ -88,7 +90,7 @@ class PathPlanner(Node):
 
         self.grid = Grid(np.zeros((1, 1)), self.steeringVal, self.pathDiscrete / self.gridRes)
         self.finder = AstarFinder(self.robotCollisionRad / self.gridRes,
-                                  2,
+                                  self.timeout,
                                   self.goalRad / self.gridRes)
 
     def global_map_callback(self, msg):
