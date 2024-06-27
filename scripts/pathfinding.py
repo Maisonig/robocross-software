@@ -21,9 +21,9 @@ class Grid:
     def __init__(self, arr: np.ndarray, steering, path_discrete):
 
         self.forward_neighbours = [
-            (path_discrete, steering, 1.4),
+            (path_discrete, steering, 1.2),
             (path_discrete, 0., 1),
-            (path_discrete, -steering, 1.4),
+            (path_discrete, -steering, 1.2),
             # (path_discrete, steering / 2, 1.2),
             # (path_discrete, -steering / 2, 1.2),
         ]
@@ -173,6 +173,8 @@ class AstarFinder:
 
             # Если за время таймаута путь не обнаружен, прерываем цикл и ничего не возвращаем
             if time.time() > start_time + self.timeout:
+                print('timeout')
+                # return reconstruct_path(grid, closed_list)
                 return "Timeout"
                 pass
 
@@ -185,7 +187,7 @@ class AstarFinder:
                     pass
                 else:
                     heuristic = get_euclidian(abs(x - x1), abs(y - y1))
-                    total = heuristic + grid.pass_weight[y, x] + grid_weight * 1000
+                    total = heuristic + grid.pass_weight[y, x] + grid_weight * 10
                     if total < grid.weight[current[1], current[0]] or not grid.visited[y, x]:
                         grid.heuristic[y, x] = heuristic
                         grid.weight[y, x] = total

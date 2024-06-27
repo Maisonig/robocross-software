@@ -61,7 +61,7 @@ class Mapping(Node):
         self.odomData = Odometry()
         self.frontScanData = LaserScan()
         self.rearScanData = LaserScan()
-        self.mapArray = np.zeros([int(self.mapSize / self.mapRes), int(self.mapSize / self.mapRes)], np.uint8) + 127
+        self.mapArray = np.zeros([int(self.mapSize / self.mapRes), int(self.mapSize / self.mapRes)], np.uint8) + 255
 
     def main_timer_callback(self):
         self.publish_tf()
