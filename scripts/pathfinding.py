@@ -1,15 +1,8 @@
-import time
-
 import cv2
+import time
 import numpy as np
 
-
-def polar_to_decart(rho, phi):
-    return rho * np.cos(phi), rho * np.sin(phi)
-
-
-def decart_to_polar(x, y):
-    return np.sqrt(x ** 2 + y ** 2), np.arctan2(y, x)
+from utils import polar_to_decart
 
 
 def get_euclidian(dx, dy):
@@ -24,16 +17,12 @@ class Grid:
             (path_discrete, steering, 1.2),
             (path_discrete, 0., 1),
             (path_discrete, -steering, 1.2),
-            # (path_discrete, steering / 2, 1.2),
-            # (path_discrete, -steering / 2, 1.2),
         ]
 
         self.backward_neighbours = [
             (-path_discrete, steering, 1.4),
             (-path_discrete, 0., 1),
             (-path_discrete, -steering, 1.4),
-            (-path_discrete, steering / 2, 1.2),
-            (-path_discrete, -steering / 2, 1.2),
         ]
 
         self.both_neighbours = [
@@ -173,10 +162,10 @@ class AstarFinder:
 
             # Если за время таймаута путь не обнаружен, прерываем цикл и ничего не возвращаем
             if time.time() > start_time + self.timeout:
-                print('timeout')
+                # print('timeout')
                 # return reconstruct_path(grid, closed_list)
                 return "Timeout"
-                pass
+                # pass
 
             neighbours = grid.get_neighbours(current)
             for neighbour in neighbours:

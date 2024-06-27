@@ -38,8 +38,6 @@ include_directories(include)
 ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
-  scripts/global_mapping.py
-  scripts/local_mapping.py
   scripts/cloud_to_scan.py
   scripts/path_planning.py
   scripts/camera_driver.py
