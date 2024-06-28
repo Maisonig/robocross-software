@@ -16,7 +16,6 @@ from nav_msgs.msg import OccupancyGrid, Odometry
 
 class Mapping(Node):
 
-    RELEVANT_DATA_TIMEOUT = 2.
     UNKNOWN_CELL = 255
     FREE_CELL = 0
     OBSTACLE_CELL = 100
@@ -72,7 +71,7 @@ class Mapping(Node):
         self.set_scan(self.rearScanData, self.rearScanPos)
         self.set_obstacles()
 
-        print(1 / (time.time() - start_time))
+        # print(1 / (time.time() - start_time))
 
         self.publish_map()
 
@@ -123,7 +122,6 @@ class Mapping(Node):
                     self.get_logger().info('Robot sensor vision is out of bounds')
                     break
         else:
-            # self.get_logger().info(f"Laserscan message from {} is empty")
             pass
 
     def publish_map(self):

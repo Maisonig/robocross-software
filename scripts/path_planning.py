@@ -1,28 +1,15 @@
 #!/usr/bin/env python3
-import time
 
+import time
 import rclpy
 import numpy as np
 import ros2_numpy as rnp
-from geometry_msgs.msg import PoseStamped
+
 from rclpy.node import Node
-from math import asin, atan2, degrees
-from nav_msgs.msg import OccupancyGrid, Odometry, Path
+from utils import euler_from_quaternion
+from geometry_msgs.msg import PoseStamped
 from pathfinding import Grid, AstarFinder
-
-
-def quaternion_to_euler(x, y, z, w):
-    t0 = +2.0 * (w * x + y * z)
-    t1 = +1.0 - 2.0 * (x * x + y * y)
-    x_ = degrees(atan2(t0, t1))
-    t2 = +2.0 * (w * y - z * x)
-    t2 = +1.0 if t2 > +1.0 else t2
-    t2 = -1.0 if t2 < -1.0 else t2
-    y_ = degrees(asin(t2))
-    t3 = +2.0 * (w * z + x * y)
-    t4 = +1.0 - 2.0 * (y * y + z * z)
-    z_ = degrees(atan2(t3, t4))
-    return x_, y_, z_
+from nav_msgs.msg import OccupancyGrid, Odometry, Path
 
 
 def is_in_goal(current: Odometry, goal: PoseStamped, goal_rad: float):
@@ -32,6 +19,22 @@ def is_in_goal(current: Odometry, goal: PoseStamped, goal_rad: float):
         if y2 - goal_rad > y1 > y2 + goal_rad:
             return True
     return False
+
+
+def remap_robot_coord(current: Odometry, map_array: np.ndarray, map_resolution: float):
+    x = int(map_array.shape[0] - map_array.shape[0] / 2 + current.pose.pose.position.x / map_resolution)
+    y = int(map_array.shape[1] - map_array.shape[1] / 2 + current.pose.pose.position.y / map_resolution)
+    a, b, th = euler_from_quaternion(current.pose.pose.orientation.x,
+                                     current.pose.pose.orientation.y,
+                                     current.pose.pose.orientation.z,
+                                     current.pose.pose.orientation.w, )
+    return x, y, th
+
+
+def remap_goal_coord(goal: PoseStamped, map_array: np.ndarray, map_resolution: float):
+    x = int(map_array.shape[0] - map_array.shape[0] / 2 + goal.pose.position.x / map_resolution)
+    y = int(map_array.shape[1] - map_array.shape[1] / 2 + goal.pose.position.y / map_resolution)
+    return x, y
 
 
 class PathPlanner(Node):
@@ -103,56 +106,45 @@ class PathPlanner(Node):
         self.goalData = msg
 
     def timer_callback(self):
-        # Проверить задан ли пункт назначения
+        # Check that the destination has been received
         if self.goalData != PoseStamped():
-            # Проверить не находится ли робот в пункте назначения
+            # Check that the robot is not at the destination
             if not is_in_goal(self.odomData, self.goalData, self.goalRad):
-                # Проверить получена ли карта навигации
+                # Check that the occupancy grid has been received
                 if self.mapData != OccupancyGrid():
-                    # Получить глобальную сетку препятствий
-                    g = np.array(rnp.numpify(self.mapData), np.uint8)
-                    g[g == 255] = 127
-                    g[g == 0] = 0
-                    g[g == 100] = 255
-                    self.grid.init_grid(g)
-                    # Получить текущие координаты робота
-                    x1 = int(g.shape[0] - g.shape[0] / 2 + self.odomData.pose.pose.position.x * 10)
-                    y1 = int(g.shape[1] - g.shape[1] / 2 + self.odomData.pose.pose.position.y * 10)
-                    a, b, th = quaternion_to_euler(self.odomData.pose.pose.orientation.x,
-                                                   self.odomData.pose.pose.orientation.y,
-                                                   self.odomData.pose.pose.orientation.z,
-                                                   self.odomData.pose.pose.orientation.w, )
-                    th = np.deg2rad(th)
-                    # Получить координаты голевой позиции
-                    x2 = int(g.shape[0] - g.shape[0] / 2 + self.goalData.pose.position.x * 10)
-                    y2 = int(g.shape[1] - g.shape[1] / 2 + self.goalData.pose.position.y * 10)
-                    # Поиск пути
-                    st = time.time()
-                    path = self.finder.get_path(self.grid, (x1, y1, th), (x2, y2))
-                    # self.get_logger().info(str(time.time() - st))
-                    # Если путь найден
+                    # Convert the occupancy grid to a numpy array
+                    map_array = np.array(rnp.numpify(self.mapData), np.uint8)
+                    map_array[map_array == 100] = 255
+                    # Refresh grid for finder
+                    self.grid.init_grid(map_array)
+                    # Convert the odometry to array coordinates
+                    x1, y1, th1 = remap_robot_coord(self.odomData, map_array, self.gridRes)
+                    # Convert the goal pose to array coordinates
+                    x2, y2 = remap_goal_coord(self.goalData, map_array, self.gridRes)
+                    # Search the path by hybrid astar
+                    path = self.finder.get_path(self.grid, (x1, y1, th1), (x2, y2))
+                    # If the path exist
                     if type(path) is list:
-                        self.publish_path(path, g.shape)
+                        # Publish the path in the ros2 topic
+                        self.publish_path(path, map_array.shape)
+                        # self.get_logger().info(f"{th1}:::::::{path[0][2]}")
                     else:
-                        self.publish_path(None, g.shape)
+                        # Publish an empty path in the ros2 topic
+                        self.publish_path(None, map_array.shape)
+                        # Log the error from finder algorithm
                         self.get_logger().warn(path)
                 else:
                     self.get_logger().warn('No global map detected!')
-            else:
-                self.get_logger().info("Goal reached!")
-                self.publish_path(None, (0, 0))
-        else:
-            pass
 
-    def publish_path(self, path, grid_shape):
+    def publish_path(self, path, map_shape):
         msg = Path()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = self.robotBaseFrame
         if path:
             for pose in path:
                 p = PoseStamped()
-                p.pose.position.x = float(pose[0]) * self.gridRes - grid_shape[0] * self.gridRes / 2
-                p.pose.position.y = float(pose[1]) * self.gridRes - grid_shape[1] * self.gridRes / 2
+                p.pose.position.x = float(pose[0]) * self.gridRes - map_shape[0] * self.gridRes / 2
+                p.pose.position.y = float(pose[1]) * self.gridRes - map_shape[1] * self.gridRes / 2
                 p.pose.orientation.z = float(pose[2])
                 msg.poses.append(p)
         self.pathPub.publish(msg)

@@ -24,8 +24,8 @@
         </spherical_coordinates>
 
         <physics name="1ms" type="ignored">
-            <max_step_size>0.05</max_step_size>
-            <real_time_factor>0.2</real_time_factor>
+            <max_step_size>0.01</max_step_size>
+            <real_time_factor>1.</real_time_factor>
         </physics>
         <plugin
             filename="gz-sim-imu-system"
@@ -3078,7 +3078,7 @@
             </link>
 
             <link name="front_camera_link">
-                <pose>2.16 0 -0.47 0 0 0</pose>
+                <pose>2.16 0 -0.5 0 0 0</pose>
                 <inertial>
                     <mass>0.1</mass>
                     <inertia>
@@ -3104,7 +3104,7 @@
                 <sensor name="camera" type="camera">
                     <topic>/front_camera/image</topic>
                     <camera>
-                        <horizontal_fov>1.047</horizontal_fov>
+                        <horizontal_fov>1.396</horizontal_fov>
                         <image>
                             <width>640</width>
                             <height>480</height>
@@ -3127,21 +3127,21 @@
                     <ray>
                         <scan>
                             <horizontal>
-                                <samples>90</samples>
+                                <samples>200</samples>
                                 <resolution>1</resolution>
-                                <min_angle>-0.785</min_angle>
-                                <max_angle>0.785</max_angle>
+                                <min_angle>-0.7</min_angle>
+                                <max_angle>0.7</max_angle>
                             </horizontal>
                             <vertical>
-                                <samples>60</samples>
+                                <samples>120</samples>
                                 <resolution>1</resolution>
-                                <min_angle>-0.52</min_angle>
-                                <max_angle>0.52</max_angle>
+                                <min_angle>-0.48</min_angle>
+                                <max_angle>0.48</max_angle>
                             </vertical>
                         </scan>
                         <range>
-                            <min>0.08</min>
-                            <max>32.0</max>
+                            <min>0.7</min>
+                            <max>12.0</max>
                             <resolution>0.01</resolution>
                         </range>
                     </ray>

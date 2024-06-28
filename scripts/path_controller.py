@@ -1,40 +1,16 @@
 #!/usr/bin/env python3
-import array
-import sys
-import time
 
-import cv2
 import rclpy
 import numpy as np
-import depthai as dai
-import ros2_numpy as rnp
-from geometry_msgs.msg import Twist, PoseStamped
-from nav_msgs.msg import Path, Odometry
 
 from rclpy.node import Node
-from sensor_msgs.msg import PointCloud2, Image, PointField
+from utils import euler_from_quaternion
+from nav_msgs.msg import Path, Odometry
+from geometry_msgs.msg import Twist, PoseStamped, Pose
 
 
-def quaternion_to_euler(x, y, z, w):
-    ysqr = y * y
-
-    t0 = +2.0 * (w * x + y * z)
-    t1 = +1.0 - 2.0 * (x * x + ysqr)
-    X = np.degrees(np.arctan2(t0, t1))
-
-    t2 = +2.0 * (w * y - z * x)
-    t2 = np.where(t2 > +1.0, +1.0, t2)
-    # t2 = +1.0 if t2 > +1.0 else t2
-
-    t2 = np.where(t2 < -1.0, -1.0, t2)
-    # t2 = -1.0 if t2 < -1.0 else t2
-    Y = np.degrees(np.arcsin(t2))
-
-    t3 = +2.0 * (w * z + x * y)
-    t4 = +1.0 - 2.0 * (ysqr + z * z)
-    Z = np.degrees(np.arctan2(t3, t4))
-
-    return X, Y, Z
+def pid_control_steer(pos: Pose, path: list[PoseStamped]):
+    pass
 
 
 class PathController(Node):
@@ -72,30 +48,32 @@ class PathController(Node):
 
     def timer_callback(self):
         if self.pathData.poses != [] and self.odomData != Odometry():
-            if len(self.pathData.poses) > 3:
-                pose = self.pathData.poses[2]
-                vel = 0.3
-                z = pose.pose.orientation.z
+            pose = self.odomData.pose
+            path = self.pathData.poses
 
-                x0, y0, z0 = quaternion_to_euler(self.odomData.pose.pose.orientation.x,
-                                                 self.odomData.pose.pose.orientation.y,
-                                                 self.odomData.pose.pose.orientation.z,
-                                                 self.odomData.pose.pose.orientation.w)
-                z0 = np.deg2rad(z0)
-                z2 = int(z / np.pi)
-                z3 = z2 * np.pi
-                z = z - z3
-                steer = z0 - z
-                msg = Twist()
-                msg.linear.x = 2.5
-                msg.angular.z = -2.3 * steer
-                self.cmdPub.publish(msg)
-            else:
-                msg = Twist()
-                self.cmdPub.publish(msg)
-        else:
-            msg = Twist()
-            self.cmdPub.publish(msg)
+            # if len(self.pathData.poses) > 3:
+                # pose = self.pathData.poses[0]
+                # z = pose.pose.orientation.z
+                #
+                # x0, y0, z0 = euler_from_quaternion(self.odomData.pose.pose.orientation.x,
+                #                                    self.odomData.pose.pose.orientation.y,
+                #                                    self.odomData.pose.pose.orientation.z,
+                #                                    self.odomData.pose.pose.orientation.w)
+                # z3 = int(z / np.pi) * np.pi
+                # z = z - z3
+                # steer = z0 - z
+
+                # steer = z0 - z
+                # msg = Twist()
+                # msg.linear.x = 1.
+                # msg.angular.z = 3 * -steer
+                # self.cmdPub.publish(msg)
+        #     else:
+        #         msg = Twist()
+        #         self.cmdPub.publish(msg)
+        # else:
+        #     msg = Twist()
+        #     self.cmdPub.publish(msg)
 
 
 def main():

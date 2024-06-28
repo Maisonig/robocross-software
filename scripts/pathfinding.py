@@ -14,9 +14,9 @@ class Grid:
     def __init__(self, arr: np.ndarray, steering, path_discrete):
 
         self.forward_neighbours = [
-            (path_discrete, steering, 1.2),
             (path_discrete, 0., 1),
-            (path_discrete, -steering, 1.2),
+            (path_discrete, steering, 1.4),
+            (path_discrete, -steering, 1.4),
         ]
 
         self.backward_neighbours = [
@@ -88,8 +88,8 @@ def reconstruct_path(grid, nodes):
         p_.append((x, y))
         start = (grid.parent[start[1], start[0]])
     p = list(reversed(p))
-    th = grid.dir[nodes[0][1], nodes[0][0]]
-    p.append((nodes[0][0], nodes[0][1], th))
+    # th = grid.dir[nodes[0][1], nodes[0][0]]
+    # p.append((nodes[0][0], nodes[0][1], th))
     return p
 
 
@@ -164,8 +164,8 @@ class AstarFinder:
             if time.time() > start_time + self.timeout:
                 # print('timeout')
                 # return reconstruct_path(grid, closed_list)
-                return "Timeout"
-                # pass
+                # return "Timeout"
+                pass
 
             neighbours = grid.get_neighbours(current)
             for neighbour in neighbours:
