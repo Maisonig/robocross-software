@@ -39,11 +39,9 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   scripts/cloud_to_scan.py
-  scripts/path_planning.py
   scripts/camera_driver.py
   scripts/pathfinding.py
   scripts/path_controller.py
-  scripts/mapping.py
   scripts/path_mapping.py
   scripts/utils.py
   scripts/waypoint_following.py
