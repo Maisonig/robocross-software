@@ -26,17 +26,10 @@ def generate_launch_description():
         parameters=[param_file]
     )
 
-    action_mapping = Node(
+    action_path_mapping = Node(
         package='car_bot',
-        executable='mapping.py',
-        name='mapping',
-        parameters=[param_file]
-    )
-
-    action_path_planning = Node(
-        package='car_bot',
-        executable='path_planning.py',
-        name='path_planning',
+        executable='path_mapping.py',
+        name='path_mapping',
         parameters=[param_file]
     )
 
@@ -58,8 +51,7 @@ def generate_launch_description():
     ld.add_action(action_simulation_launch)
     ld.add_action(action_rviz_launch)
     ld.add_action(action_front_cloud_to_scan)
-    ld.add_action(action_mapping)
-    ld.add_action(action_path_planning)
-    # ld.add_action(action_path_controller)
+    ld.add_action(action_path_mapping)
+    ld.add_action(action_path_controller)
     ld.add_action(action_waypoint_following)
     return ld

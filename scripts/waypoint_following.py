@@ -24,7 +24,8 @@ class WaypointFollowing(Node):
         self.declare_parameter('odom_topic', '/odom')
         self.declare_parameter('goal_topic', '/goal_pose')
         self.declare_parameter('goal_radius', 5.0)
-        self.declare_parameter('waypoints', [19.8653, -10.3495, 29.2345, -23.4966])
+        self.declare_parameter('waypoints', [20.6453, -9.80267, 24.3003, -31.9225, 13.7962, -46.5684,
+                                             -3.74152, -51.6982, -0.0843143, -0.171923])
         self.declare_parameter('map_frame', 'map')
         self.declare_parameter('start_following', False)
 

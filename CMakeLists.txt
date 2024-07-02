@@ -44,6 +44,7 @@ install(PROGRAMS
   scripts/pathfinding.py
   scripts/path_controller.py
   scripts/mapping.py
+  scripts/path_mapping.py
   scripts/utils.py
   scripts/waypoint_following.py
   DESTINATION lib/${PROJECT_NAME}

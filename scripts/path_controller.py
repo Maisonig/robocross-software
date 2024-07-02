@@ -9,10 +9,6 @@ from nav_msgs.msg import Path, Odometry
 from geometry_msgs.msg import Twist, PoseStamped, Pose
 
 
-def pid_control_steer(pos: Pose, path: list[PoseStamped]):
-    pass
-
-
 class PathController(Node):
     FPS = 30
 
@@ -37,8 +33,10 @@ class PathController(Node):
         self.pathData = Path()
         self.odomData = Odometry()
 
-        self.oldPath = Path()
-        self.oldPathCounter = 0
+        self.pSteeringRatio = 2.0
+        self.dSteeringRatio = 0.0
+
+        self.speed = 1.
 
     def path_callback(self, msg):
         self.pathData = msg
@@ -48,32 +46,39 @@ class PathController(Node):
 
     def timer_callback(self):
         if self.pathData.poses != [] and self.odomData != Odometry():
-            pose = self.odomData.pose
+            pose = self.odomData.pose.pose
             path = self.pathData.poses
+            steer = self.pd_control_steer(pose, path)
+            speed = self.speed
+            print(speed)
+        else:
+            speed = 0.
+            steer = 0.
+        msg = Twist()
+        msg.linear.x = speed
+        msg.angular.z = steer
+        self.cmdPub.publish(msg)
 
-            # if len(self.pathData.poses) > 3:
-                # pose = self.pathData.poses[0]
-                # z = pose.pose.orientation.z
-                #
-                # x0, y0, z0 = euler_from_quaternion(self.odomData.pose.pose.orientation.x,
-                #                                    self.odomData.pose.pose.orientation.y,
-                #                                    self.odomData.pose.pose.orientation.z,
-                #                                    self.odomData.pose.pose.orientation.w)
-                # z3 = int(z / np.pi) * np.pi
-                # z = z - z3
-                # steer = z0 - z
+    def pd_control_steer(self, pose: Pose, path: list[PoseStamped]):
+        angle = euler_from_quaternion(pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w)[2]
+        goal_pose = path[0].pose
+        goal_angle = goal_pose.orientation.z
+        delta_angle = goal_angle - angle
 
-                # steer = z0 - z
-                # msg = Twist()
-                # msg.linear.x = 1.
-                # msg.angular.z = 3 * -steer
-                # self.cmdPub.publish(msg)
-        #     else:
-        #         msg = Twist()
-        #         self.cmdPub.publish(msg)
-        # else:
-        #     msg = Twist()
-        #     self.cmdPub.publish(msg)
+        p_ = self.pSteeringRatio * delta_angle
+
+        i = 2
+        d_ = self.dSteeringRatio * delta_angle
+        if len(path) > 2:
+            for p in path[1:]:
+                th = euler_from_quaternion(p.pose.orientation.x, p.pose.orientation.y, p.pose.orientation.z,
+                                           p.pose.orientation.w)[2]
+                dt = th - angle
+                d_ += dt * (self.dSteeringRatio / i)
+                if i == 5:
+                    break
+        pd_ = p_ - d_
+        return pd_
 
 
 def main():

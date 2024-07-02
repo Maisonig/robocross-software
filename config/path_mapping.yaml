@@ -1,0 +1,23 @@
+path_mapping:
+  ros__parameters:
+    frequency: 30
+    front_scan_topic: /front_camera/scan
+    rear_scan_topic: /rear_camera/scan
+    odom_topic: /odom
+    map_topic: /map
+    robot_base_frame: chassis
+    robot_collision_radius: 2.5
+    map_size: 200
+    local_map_size: 100
+    map_resolution: 0.1
+    map_frame: map
+    front_scan_position: [ 2.2, 0.0, 0.0 ]
+    rear_scan_position: [ -2.2, 0.0, 0.0 ]
+    goal_topic: /goal_pose
+    path_topic: /path
+    path_collision_radius: 3.
+    goal_radius: 1.
+    steering_value: 0.3
+    path_discrete: 0.5
+    path_base_frame: base_footprint
+    grid_resolution: 0.1
