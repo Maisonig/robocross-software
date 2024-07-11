@@ -1,0 +1,9 @@
+path_controller:
+  ros__parameters:
+    frequency: 30
+    path_topic: /path
+    odom_topic: /odom
+    cmd_topic: /cmd_vel
+    p_steering_ratio: 2.5
+    p_speed_ratio: 1.0
+    average_speed: 1.0
