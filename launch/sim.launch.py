@@ -30,6 +30,7 @@ def generate_launch_description():
         package='car_bot',
         executable='path_mapping.py',
         name='path_mapping',
+        output="screen",
         parameters=[param_file]
     )
 

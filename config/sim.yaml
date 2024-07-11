@@ -15,59 +15,40 @@ front_cloud_to_scan:
     angle_min: -0.7
     rays_number: 200
 
-mapping:
-  ros__parameters:
-    frequency: 30
-    front_scan_topic: /front_camera/scan
-    rear_scan_topic: /rear_camera/scan
-    odom_topic: /odom
-    map_topic: /map
-    robot_base_frame: chassis
-    robot_collision_radius: 2.5
-    map_size: 200
-    map_resolution: 0.1
-    map_frame: map
-    front_scan_position: [2.2, 0.0, 0.0]
-    rear_scan_position: [-2.2, 0.0, 0.0]
-
-path_planning:
-  ros__parameters:
-    frequency: 30
-    global_grid_topic: /map
-    odom_topic: /odom
-    goal_topic: /goal_pose
-    path_topic: /path
-    robot_collision_radius: 1.5
-    goal_radius: 2.0
-    steering_value: 0.24 # не ставить меньше 0.2
-    path_discrete: 1.0
-    robot_base_frame: map
-    grid_resolution: 0.1
-    timeout: 2.0
-
 path_mapping:
   ros__parameters:
     frequency: 30
     front_scan_topic: /front_camera/scan
     rear_scan_topic: /rear_camera/scan
-    odom_topic: /odom
-    map_topic: /map
-    robot_base_frame: chassis
-    robot_collision_radius: 2.5
-    map_size: 200
-    local_map_size: 20
-    map_resolution: 0.1
-    map_frame: map
     front_scan_position: [ 2.2, 0.0, 0.0 ]
     rear_scan_position: [ -2.2, 0.0, 0.0 ]
+    map_topic: /map
+    map_infiltration_radius: 2.5
+    map_size: 200
+    local_map_size: 40
+    map_resolution: 0.1
+    map_frame: map
+    robot_base_frame: chassis
+    odom_topic: /odom
     goal_topic: /goal_pose
     path_topic: /path
     path_collision_radius: 1.5
     goal_radius: 2.
-    steering_value: 0.3
+    steering_value: 0.35
     path_discrete: 1.5
     path_base_frame: map
     grid_resolution: 0.1
+    timeout: 0.2
+
+path_controller:
+  ros__parameters:
+    frequency: 30
+    path_topic: /path
+    odom_topic: /odom
+    cmd_topic: /cmd_vel
+    p_steering_ratio: 3.0
+    p_speed_ratio: 1.0
+    average_speed: 1.3
 
 waypoint_following:
   ros__parameters:
@@ -75,6 +56,8 @@ waypoint_following:
     odom_topic: /odom
     goal_topic: /goal_pose
     goal_radius: 5.0
-    waypoints: [20.6453, -9.80267, 24.3003, -31.9225, 13.7962, -46.5684, -3.74152, -51.6982, -0.0843143, -0.171923] # метрические x и y координаты точек
+    # waypoints: [20.6453, -9.80267, 0., 24.3003, -31.9225, 0., 13.7962, -46.5684, 0., 20.6453, -9.80267, 1., -3.74152, -51.6982, 0., -0.0843143, -0.171923, 0.] # метрические x и y координаты точек
+    # waypoints: [20.6453, -9.80267, 0., 24.3003, -31.9225, 0., 13.7962, -46.5684, 0., -3.74152, -51.6982, 0., 20.6453, -9.80267, 1.]
+    waypoints: [20.6453, -9.80267, 0., 24.3003, -31.9225, 0., 13.7962, -46.5684, 0., 20.6453, -9.80267, 1.]
     map_frame: map
     start_following: False # Начинать следование только после запуска и инициализации всех нод

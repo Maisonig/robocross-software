@@ -24,8 +24,12 @@ class WaypointFollowing(Node):
         self.declare_parameter('odom_topic', '/odom')
         self.declare_parameter('goal_topic', '/goal_pose')
         self.declare_parameter('goal_radius', 5.0)
-        self.declare_parameter('waypoints', [20.6453, -9.80267, 24.3003, -31.9225, 13.7962, -46.5684,
-                                             -3.74152, -51.6982, -0.0843143, -0.171923])
+        self.declare_parameter('waypoints', [-5., -5., 0.,
+                                             20.6453, -9.80267, 0.,
+                                             24.3003, -31.9225, 0.,
+                                             13.7962, -46.5684, 0.,
+                                             -3.74152, -51.6982, 0.,
+                                             -0.0843143, -0.171923, 0.])
         self.declare_parameter('map_frame', 'map')
         self.declare_parameter('start_following', False)
 
@@ -38,9 +42,9 @@ class WaypointFollowing(Node):
         self.isStart = False
         self.waypoints = []
         j = 0
-        for i in range(int(len(points) / 2)):
-            self.waypoints.append([points[j], points[j + 1]])
-            j += 2
+        for i in range(int(len(points) / 3)):
+            self.waypoints.append([points[j], points[j + 1], points[j + 2]])
+            j += 3
 
         self.odomSub = self.create_subscription(Odometry,
                                                 odom_topic,
@@ -70,6 +74,7 @@ class WaypointFollowing(Node):
                 self.goalData.header.frame_id = self.mapFrame
                 self.goalData.pose.position.x = self.waypoints[0][0]
                 self.goalData.pose.position.y = self.waypoints[0][1]
+                self.goalData.pose.position.z = self.waypoints[0][2]
                 self.goalPub.publish(self.goalData)
                 self.pubFlg = True
             else:

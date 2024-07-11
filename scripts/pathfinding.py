@@ -20,8 +20,8 @@ class Grid:
         ]
 
         self.backward_neighbours = [
-            (-path_discrete, steering, 1.4),
             (-path_discrete, 0., 1),
+            (-path_discrete, steering, 1.4),
             (-path_discrete, -steering, 1.4),
         ]
 
@@ -29,10 +29,12 @@ class Grid:
             (path_discrete, steering, 1.4),
             (path_discrete, 0., 1),
             (path_discrete, -steering, 1.4),
-            (-path_discrete, steering, 2.8),
-            (-path_discrete, 0., 2),
-            (-path_discrete, -steering, 2.8),
+            (-path_discrete, steering, 14.),
+            (-path_discrete, 0., 10.),
+            (-path_discrete, -steering, 14.),
         ]
+
+        self.pathDiscrete = path_discrete
 
         self.neighbours = self.forward_neighbours
 
@@ -104,6 +106,10 @@ class AstarFinder:
         self.circleRad = 1 + int(np.sqrt(self.robotRad ** 2 + self.robotRad ** 2))
         self.circleThick = int(self.circleRad - self.robotRad)
 
+        self.uturnState = 0
+        self.uturnDist = 0
+        self.uturnGoal = None
+
     def check_collision(self, grid, node, radius):
         try:
             col = np.copy(grid.grid[int(node[1] - radius):int(node[1] + radius),
@@ -164,7 +170,7 @@ class AstarFinder:
             if time.time() > start_time + self.timeout:
                 # print('timeout')
                 # return reconstruct_path(grid, closed_list)
-                # return "Timeout"
+                return "Timeout"
                 pass
 
             neighbours = grid.get_neighbours(current)
@@ -185,6 +191,58 @@ class AstarFinder:
                             grid.visited[y, x] = True
                             open_list.append(neighbour)
                             open_list_weights.append(total)
+
+    def get_uturn(self, grid, start_pos):
+        path = []
+        if self.uturnState == 0:
+            self.uturnGoal = start_pos
+            self.uturnDist = 0.
+            self.uturnState = 1
+        if self.uturnState == 1:
+            cur = (start_pos[0], start_pos[1])
+            grid.dir[cur[1], cur[0]] = start_pos[2]
+            self.uturnDist += get_euclidian(cur[0] - self.uturnGoal[0], cur[1] - self.uturnGoal[1])
+            while self.check_collision(grid, cur, self.robotRad) and self.uturnDist < 56:
+                neighbour = grid.get_neighbours(cur)[1]
+                neighbour_dir = grid.dir[neighbour[1], neighbour[0]]
+                path.append([neighbour[0], neighbour[1], neighbour_dir])
+                cur = neighbour
+            self.uturnGoal = start_pos
+            print(f"{self.uturnDist}")
+            try:
+                path.pop(-1)
+                if len(path) <= 1:
+                    self.uturnState = 2
+                    self.uturnGoal = start_pos
+                    return 'End of first u-turn step'
+                return path
+            except IndexError:
+                self.uturnState = 2
+                self.uturnGoal = start_pos
+
+                return 'End of first u-turn step'
+        if self.uturnState == 2:
+            grid.neighbours = grid.backward_neighbours
+            cur = (start_pos[0], start_pos[1])
+            grid.dir[cur[1], cur[0]] = start_pos[2]
+            goal = get_euclidian(cur[0] - self.uturnGoal[0], cur[1] - self.uturnGoal[1])
+            while goal < 56:
+                neighbour = grid.get_neighbours(cur)[1]
+                neighbour_dir = grid.dir[neighbour[1], neighbour[0]]
+                path.append([neighbour[0], neighbour[1], neighbour_dir])
+                cur = neighbour
+                goal = get_euclidian(cur[0] - self.uturnGoal[0], cur[1] - self.uturnGoal[1])
+            try:
+                path.pop(-1)
+                if len(path) <= 1:
+                    self.uturnState = 3
+                    grid.neighbours = grid.forward_neighbours
+                    return 'End of second u-turn step'
+                return path
+            except IndexError:
+                self.uturnState = 3
+                grid.neighbours = grid.forward_neighbours
+                return 'End of second u-turn step'
 
 
 # a = np.zeros((100, 100), dtype=np.uint8)

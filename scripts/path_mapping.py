@@ -41,7 +41,8 @@ def remap_robot_coord(current: Odometry, map_array: np.ndarray, map_resolution: 
 def remap_goal_coord(goal: PoseStamped, map_array: np.ndarray, map_resolution: float):
     x = int(map_array.shape[0] - map_array.shape[0] / 2 + goal.pose.position.x / map_resolution)
     y = int(map_array.shape[1] - map_array.shape[1] / 2 + goal.pose.position.y / map_resolution)
-    return x, y
+    uturn = True if goal.pose.position.z == 1. else False
+    return x, y, uturn
 
 
 class PathMapping(Node):
@@ -56,24 +57,26 @@ class PathMapping(Node):
         self.declare_parameter('frequency', 30)
         self.declare_parameter('front_scan_topic', '/front_camera/scan')
         self.declare_parameter('rear_scan_topic', '/rear_camera/scan')
-        self.declare_parameter('odom_topic', '/odom')
-        self.declare_parameter('map_topic', '/map')
-        self.declare_parameter('robot_base_frame', 'chassis')
-        self.declare_parameter('map_size', 150)
-        self.declare_parameter('local_map_size', 20)
-        self.declare_parameter('map_resolution', 0.1)
-        self.declare_parameter('map_frame', 'map')
-        self.declare_parameter('robot_collision_radius', 2.)
         self.declare_parameter('front_scan_position', [2.2, 0.0, 0.0])
         self.declare_parameter('rear_scan_position', [-2.2, 0.0, 0.0])
+
+        self.declare_parameter('map_topic', '/map')
+        self.declare_parameter('map_resolution', 0.1)
+        self.declare_parameter('map_frame', 'map')
+        self.declare_parameter('map_infiltration_radius', 2.5)
+        self.declare_parameter('map_size', 150)
+        self.declare_parameter('local_map_size', 20)
+
+        self.declare_parameter('odom_topic', '/odom')
+        self.declare_parameter('robot_base_frame', 'chassis')
 
         self.declare_parameter('goal_topic', '/goal_pose')
         self.declare_parameter('path_topic', '/path')
         self.declare_parameter('path_base_frame', 'map')
         self.declare_parameter('path_collision_radius', 1.5)
-        self.declare_parameter('goal_radius', 2.)
-        self.declare_parameter('steering_value', 0.22)
-        self.declare_parameter('path_discrete', 1.0)
+        self.declare_parameter('goal_radius', 3.)
+        self.declare_parameter('steering_value', 0.33)
+        self.declare_parameter('path_discrete', 1.5)
         self.declare_parameter('timeout', 1.0)
 
         freq = self.get_parameter('frequency').get_parameter_value().integer_value
@@ -90,7 +93,7 @@ class PathMapping(Node):
         self.mapSize = self.get_parameter('map_size').get_parameter_value().integer_value
         self.localMapSize = self.get_parameter('local_map_size').get_parameter_value().integer_value
         self.mapRes = self.get_parameter('map_resolution').get_parameter_value().double_value
-        self.robotColRadius = self.get_parameter('robot_collision_radius').get_parameter_value().double_value
+        self.robotColRadius = self.get_parameter('map_infiltration_radius').get_parameter_value().double_value
         self.frontScanPos = self.get_parameter('front_scan_position').get_parameter_value().double_array_value
         self.rearScanPos = self.get_parameter('rear_scan_position').get_parameter_value().double_array_value
 
@@ -139,14 +142,19 @@ class PathMapping(Node):
         self.set_scan(self.rearScanData, self.rearScanPos)
         self.set_obstacles(x1, y1)
 
-        # self.publish_map()
-
         if self.goalData != PoseStamped():
             if not is_in_goal(self.odomData, self.goalData, self.goalRad):
                 map_array = np.copy(self.mapArray)
                 self.grid.init_grid(self.mapArray)
-                x2, y2 = remap_goal_coord(self.goalData, self.mapArray, self.mapRes)
-                path = self.finder.get_path(self.grid, (x1, y1, th1), (x2, y2))
+                x2, y2, uturn = remap_goal_coord(self.goalData, self.mapArray, self.mapRes)
+                if uturn and self.finder.uturnState != 3:
+                    path = self.finder.get_uturn(self.grid, (x1, y1, th1))
+                elif uturn and self.finder.uturnState == 3:
+                    self.grid.neighbours = self.grid.forward_neighbours
+                    path = self.finder.get_path(self.grid, (x1, y1, th1), (x2, y2))
+                else:
+                    self.finder.uturnState = 0
+                    path = self.finder.get_path(self.grid, (x1, y1, th1), (x2, y2))
                 if type(path) is list:
                     self.publish_path(path, map_array.shape)
                 else:
@@ -155,7 +163,7 @@ class PathMapping(Node):
 
         self.publish_map_part(x1, y1)
         # self.publish_map()
-        print(1 / (time.time() - start_time))
+        # print(1 / (time.time() - start_time))
 
     def publish_path(self, path, map_shape):
         msg = Path()
@@ -217,8 +225,6 @@ class PathMapping(Node):
                 except IndexError:
                     self.get_logger().info('Robot sensor vision is out of bounds')
                     break
-        else:
-            pass
 
     def publish_map(self):
         oc_array = np.copy(self.mapArray)
