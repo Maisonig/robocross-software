@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import threading
 
 import cv2
 import time
@@ -11,11 +10,9 @@ from utils import *
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from tf2_ros import TransformBroadcaster
-from geometry_msgs.msg import TransformStamped
-
-from utils import euler_from_quaternion
 from geometry_msgs.msg import PoseStamped
 from pathfinding import Grid, AstarFinder
+from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import OccupancyGrid, Odometry, Path
 
 
