@@ -18,9 +18,9 @@ class PathController(Node):
         self.declare_parameter('odom_topic', '/odom')
         self.declare_parameter('cmd_topic', '/cmd_vel')
         self.declare_parameter('frequency', 30)
-        self.declare_parameter('p_steering_ratio', 2.5)
+        self.declare_parameter('p_steering_ratio', 2.)
         self.declare_parameter('p_speed_ratio', 1.)
-        self.declare_parameter('average_speed', 0.0)
+        self.declare_parameter('average_speed', 1.0)
 
         path_topic = self.get_parameter('path_topic').get_parameter_value().string_value
         odom_topic = self.get_parameter('odom_topic').get_parameter_value().string_value

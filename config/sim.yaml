@@ -48,7 +48,7 @@ path_controller:
     cmd_topic: /cmd_vel
     p_steering_ratio: 3.0
     p_speed_ratio: 1.0
-    average_speed: 1.3
+    average_speed: 1.5
 
 waypoint_following:
   ros__parameters:

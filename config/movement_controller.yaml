@@ -1,0 +1,6 @@
+movement_controller:
+  ros__parameters:
+    use_sim_time: False
+    frequency: 30
+    cmd_topic: /cmd_vel
+    reset_errors: False
