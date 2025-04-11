@@ -36,9 +36,4 @@ def generate_launch_description():
             arguments=[
                 '-d' + os.path.join(package_path, 'rviz', 'car_bot.rviz')]
         ),
-        # Node(
-        #     package="gazebo_test",
-        #     executable="frame",
-        #     name = "frame",
-        # ),
     ])

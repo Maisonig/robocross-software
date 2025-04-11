@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
+import time
+from zlib import compress
+
 import cv2
 import rclpy
 import ros2_numpy as rnp
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy
 
 from util.utils import *
 from rclpy.node import Node
-from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import LaserScan, CompressedImage
 from tf2_ros import StaticTransformBroadcaster
 from geometry_msgs.msg import PoseStamped
 from util.astar import AstarGrid, AstarFinder
@@ -100,14 +104,14 @@ class PathMapping(Node):
         self.declare_parameter('path_base_frame', 'map')
 
         # This section describes the parameters of the environment maps. The resolution for both maps is the same.
-        self.declare_parameter('global_map_size', 150) # The size of the global environment map, meters
+        self.declare_parameter('global_map_size', 1500) # The size of the global environment map, meters
         self.declare_parameter('local_map_size', 60) # Size of the local environment map, meters
         self.declare_parameter('map_infiltration_radius', 2.5) # A parameter that defines the dangerous approach zones around each obstacle, meters
         self.declare_parameter('map_resolution', 0.1) # By default, the value 1.0 is equal to a map with a resolution of 1 meter. Accordingly, 0.1 is a map with a resolution of 1 decimeter.
         self.declare_parameter('publish_global_map', False) # If false, the map will be published 1 time at the start, if true, the map will be published with a frequency <frequency>
 
         # This section describes the parameters of the route planner to the goal destination
-        self.declare_parameter('finder_type','astar') # Type of path planner (astar, hybrid_astar, omni_hybrid_astar), description of the planners on the gitHub repository page
+        self.declare_parameter('finder_type','hybrid_astar') # Type of path planner (astar, hybrid_astar, omni_hybrid_astar), description of the planners on the gitHub repository page
         self.declare_parameter('path_collision_radius', 1.5) # Simplified collision avoidance model, the parameter defines the radius of the circumscription circle around the robot, meters
         self.declare_parameter('goal_radius', 0.5) # The radius of the circle that will be considered the area of reaching the goal point must be 2 or more times larger than <path_discrete>, otherwise there may be problems with building a path, meters
         self.declare_parameter('path_discrete', 0.5) # The discreteness value of the path, the minimum value of the distance between two points of the constructed path, meters
@@ -160,7 +164,7 @@ class PathMapping(Node):
         self.mainTimer = self.create_timer(1 / freq, self.main_timer_callback)
 
         # Publishers
-        self.globalMapPub = self.create_publisher(OccupancyGrid, global_map_topic, 10)
+        self.globalMapPub = self.create_publisher(CompressedImage, global_map_topic, 10)
         self.localMapPub = self.create_publisher(OccupancyGrid, local_map_topic, 10)
 
         # Subscribers
@@ -242,6 +246,7 @@ class PathMapping(Node):
             return False
 
     def calc_path(self, f_type: str, robot_coord: tuple[int, int, any], goal_coord: tuple[int, int, any]):
+
         if self.check_goal():
             map_array = np.copy(self.globalMapArray)
             path = None
@@ -252,6 +257,8 @@ class PathMapping(Node):
             if f_type == "hybrid_astar":
                 self.hybridAstarGrid.init_grid(map_array)
                 path = self.hybridAstarFinder.get_path(self.hybridAstarGrid, robot_coord, goal_coord)
+
+
 
             # If the planner returns the path, then there are no errors, return the path.
             if type(path) is list:
@@ -268,25 +275,29 @@ class PathMapping(Node):
         remapped_robot_coord = remap_robot_coord(self.odomData, self.globalMapArray, self.mapRes)
 
         # Set scan data on map
-        self.set_scan(self.frontScanData, self.frontScanPos)
+        # self.set_scan(self.frontScanData, self.frontScanPos)
         # self.set_scan(self.rearScanData, self.rearScanPos)
         # self.set_scan(self.leftScanData, self.leftScanPos)
         # self.set_scan(self.rightScanData, self.rightScanPos)
-        self.set_obstacles(remapped_robot_coord[0], remapped_robot_coord[1])
+        # self.set_obstacles(remapped_robot_coord[0], remapped_robot_coord[1])
 
         # Send map frame static transform
         self.set_map_frame()
         # Send local map to topic
-        self.publish_local_map(remapped_robot_coord[0], remapped_robot_coord[1])
+        # self.publish_local_map(remapped_robot_coord[0], remapped_robot_coord[1])
         # Send global map to topic if flag is enable
-        if self.pubGlobalMap:
-            self.pubGlobalMap()
+        if not self.pubGlobalMap:
+            a = time.time()
+            self.publish_global_map()
+            v = (time.time() - a)
+            print(v)
 
         if self.goalData:
             # Calc goal coord relative to the coordinate axis of the ndarray numpy array
             remapped_goal_coord = remap_goal_coord(self.goalData, self.globalMapArray, self.mapRes)
             # Calc path
             path = self.calc_path(finder_type, remapped_robot_coord, remapped_goal_coord)
+
             if path:
                 self.publish_path(path, self.globalMapArray.shape)
 
@@ -298,11 +309,12 @@ class PathMapping(Node):
             p = PoseStamped()
             p.pose.position.x = float(pose[0]) * self.mapRes - map_shape[0] * self.mapRes / 2
             p.pose.position.y = float(pose[1]) * self.mapRes - map_shape[1] * self.mapRes / 2
-            q = quaternion_from_euler(0, 0, pose[2])
-            p.pose.orientation.x = q[0]
-            p.pose.orientation.y = q[1]
-            p.pose.orientation.z = q[2]
-            p.pose.orientation.w = q[3]
+            if len(pose) == 3:
+                q = quaternion_from_euler(0, 0, pose[2])
+                p.pose.orientation.x = q[0]
+                p.pose.orientation.y = q[1]
+                p.pose.orientation.z = q[2]
+                p.pose.orientation.w = q[3]
             msg.poses.append(p)
         self.pathPub.publish(msg)
 
@@ -365,11 +377,16 @@ class PathMapping(Node):
 
     def publish_global_map(self):
         oc_array = np.copy(self.globalMapArray)
-
         oc_array[oc_array == 255] = self.OBSTACLE_CELL
-
         oc_array = np.array(oc_array, np.int8)
         grid = rnp.msgify(OccupancyGrid, oc_array)
+        # g = oc_array.tobytes()
+        # compressed = compress(g)
+        # compressed = list(np.frombuffer(compressed, dtype=np.int8))
+        # grid = OccupancyGrid()
+        # grid.data = compressed
+        # grid.info.width = oc_array.shape[0]
+        # grid.info.height = oc_array.shape[1]
         grid.header.stamp = self.get_clock().now().to_msg()
         grid.header.frame_id = self.mapFrame
         grid.info.resolution = self.mapRes

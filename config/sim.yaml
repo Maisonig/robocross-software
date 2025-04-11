@@ -9,10 +9,10 @@ front_cloud_to_scan:
     x_min: 0.6 # bottom boundary of the points on the X-axis, meters
     y_max: 20.0 # top boundary of the points on the Y-axis, meters
     y_min: -20.0 # bottom boundary of the points on the Y-axis, meters
-    z_max: 0.25 # top boundary of the points on the Z-axis, meters
-    z_min: 0.2 # bottom boundary of the points on the Z-axis, meters
-    angle_max: 1.52 # top boundary of the scan, radians, meters
-    angle_min: -1.52 # bottom boundary of the scan, radians
+    z_max: 0.9 # top boundary of the points on the Z-axis, meters
+    z_min: -0.2 # bottom boundary of the points on the Z-axis, meters
+    angle_max: 0.690 # top boundary of the scan, radians, meters
+    angle_min: -0.690 # bottom boundary of the scan, radians
     rays_number: 60 # number of rays of the scan
 
 path_mapping:
@@ -103,7 +103,7 @@ waypoint_following:
     map_frame: map
 
     # Waypoints which represents points of the route, x, y, theta
-    waypoints: [20.8, -9.5, 1., 17.7, -44.8, 1.8]
+    waypoints: [20.8, -9.5, -1., 19.0, -44.8, -1.8]
 
     # Flag, if true, the points start going to the topic. Start following only after starting and initializing all nodes
     start_following: false

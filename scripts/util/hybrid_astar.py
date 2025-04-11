@@ -1,12 +1,81 @@
 import cv2
 import time
+import math
 import numpy as np
 
+
+from util.reeds_shepp import Steering, Gear, get_optimal_word
 from util.utils import polar_to_decart
 
 
 def get_euclidian(dx, dy):
     return np.sqrt(dx ** 2 + dy ** 2)
+
+
+def word_to_path(start_pose, word, curvature=1.0, step=0.1):
+    """
+    Преобразует оптимальное слово Reeds-Shepp в траекторию (x,y)
+
+    :param start_pose: Начальная позиция (x, y, yaw) в метрах и радианах
+    :param word: Список Letter из get_optimal_word()
+    :param curvature: Максимальная кривизна (1/радиус)
+    :param step: Шаг дискретизации траектории (в метрах)
+    :return: Список точек пути [(x0,y0), (x1,y1), ...]
+    """
+    x, y, yaw = start_pose
+    path = [(x, y)]
+    radius = 1.0 / curvature
+
+    for letter in word:
+        length = abs(letter.param)
+        direction = np.sign(letter.param)
+        steps = int(length / step)
+
+        # Прямолинейное движение
+        if letter.steering == Steering.STRAIGHT:
+            dx = step * direction * math.cos(yaw)
+            dy = step * direction * math.sin(yaw)
+
+            if letter.gear == Gear.BACKWARD:
+                dx *= -1
+                dy *= -1
+
+            for _ in range(steps):
+                x += dx
+                y += dy
+                path.append((x, y))
+
+        # Дуговое движение
+        else:
+            d_theta = (step / radius) * direction
+            if letter.steering == Steering.RIGHT:
+                d_theta *= -1
+
+            if letter.gear == Gear.BACKWARD:
+                d_theta *= -1
+
+            # Центр вращения
+            if letter.steering == Steering.LEFT:
+                cx = x - radius * math.sin(yaw)
+                cy = y + radius * math.cos(yaw)
+            else:
+                cx = x + radius * math.sin(yaw)
+                cy = y - radius * math.cos(yaw)
+
+            for _ in range(steps):
+                yaw += d_theta
+                if letter.steering == Steering.LEFT:
+                    x = cx + radius * math.sin(yaw)
+                    y = cy - radius * math.cos(yaw)
+                else:
+                    x = cx - radius * math.sin(yaw)
+                    y = cy + radius * math.cos(yaw)
+
+                path.append((x, y))
+
+        yaw = yaw % (2 * math.pi)  # Нормализация угла
+
+    return path
 
 
 class HybridAstarGrid:
@@ -142,6 +211,15 @@ class HybridAstarFinder:
             if len(open_list) == 0:
                 if len(closed_list) <= 1:
                     return "Robot in collision"
+            koef = 50
+            sp = (x0 / koef, y0 / koef, th0)
+            gp = (x1 / koef, y1 / koef, th1)
+            word_path = get_optimal_word(sp, gp)
+            path = word_to_path(sp, word_path, 1., 0.01)
+            pp = []
+            for a, b in path:
+                pp.append((a * koef, b * koef))
+            return pp
             min_index = open_list_weights.index(min(open_list_weights))
             current = open_list[min_index]
             open_list.pop(min_index)

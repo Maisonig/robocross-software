@@ -56,8 +56,8 @@ def generate_launch_description():
     ld.add_action(action_simulation_launch)
     ld.add_action(action_rviz_launch)
     ld.add_action(action_front_cloud_to_scan)
-    ld.add_action(action_path_mapping)
+    # ld.add_action(action_path_mapping)
     ld.add_action(action_robot_localization_ekf_launch)
-    ld.add_action(action_path_controller)
-    ld.add_action(action_waypoint_following)
+    # ld.add_action(action_path_controller)
+    # ld.add_action(action_waypoint_following)
     return ld

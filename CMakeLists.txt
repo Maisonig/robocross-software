@@ -58,6 +58,7 @@ install(PROGRAMS
   scripts/util/astar.py
   scripts/util/hybrid_astar.py
   scripts/util/utils.py
+  scripts/util/reeds_shepp.py
   DESTINATION lib/${PROJECT_NAME}/util
 )
 

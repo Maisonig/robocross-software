@@ -67,9 +67,9 @@ class PathController(Node):
         self.service_timer = self.create_timer(0.33, self.service_timer_callback)
         self.pathState = False
         self.req.names = ['path_state']
+        # First request must be after path_state_service node initialization for time synchronization
         time.sleep(5)
         self.future = self.cli.call_async(self.req)
-        # First request must be after path mapping node initialization for time synchronization
 
     def service_timer_callback(self):
         if not self.cli.wait_for_service(timeout_sec=2.0):
